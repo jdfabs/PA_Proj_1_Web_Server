@@ -1,3 +1,5 @@
+package config;
+
 import java.util.Properties;
 import java.io.IOException;
 import java.io.FileInputStream;

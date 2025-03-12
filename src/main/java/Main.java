@@ -1,6 +1,7 @@
-import java.io.IOException;
+import config.ServerConfig;
+import core.MainHTTPServerThread;
 
-import static java.lang.System.exit;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {

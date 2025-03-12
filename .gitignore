@@ -30,8 +30,8 @@ replay_pid*
 # Custom rules
 .idea
 # Ignore all the files and directories in the server directory except server.config.example
-html/*
-!html/server.config.example
-!html/favicon.ico
-!html/404.html
+server/html/*
+!server/html/server.config.example
+!server/html/favicon.ico
+!server/html/404.html
 
