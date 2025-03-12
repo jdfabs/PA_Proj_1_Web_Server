@@ -16,7 +16,7 @@ public class Main {
             System.exit(1);
         }
 
-        MainHTTPServerThread s = new MainHTTPServerThread(config.getPort());
+        MainHTTPServerThread s = new MainHTTPServerThread(config);
         s.start();
         try {
             s.join();

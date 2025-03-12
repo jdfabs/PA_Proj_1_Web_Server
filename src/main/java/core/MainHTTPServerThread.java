@@ -1,5 +1,7 @@
 package core;
 
+import config.ServerConfig;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,17 +14,18 @@ import java.nio.file.Paths;
  */
 public class MainHTTPServerThread extends Thread {
 
-    private static final String SERVER_ROOT = ""; // Define by user
+    private static String SERVER_ROOT = System.getProperty("user.dir"); // Define by user
     private final int port;
     private ServerSocket server;
 
     /**
-     * Constructor to initialize the HTTP server thread with a specified port.
+     * Constructor to initialize the HTTP server thread with a specified port and set the correct root.
      *
-     * @param port The port number on which the server will listen.
+     * @param config all configs on config folder.
      */
-    public MainHTTPServerThread(int port) {
-        this.port = port;
+    public MainHTTPServerThread(ServerConfig config) {
+        SERVER_ROOT += config.getRoot();
+        this.port = config.getPort();
     }
 
     /**
