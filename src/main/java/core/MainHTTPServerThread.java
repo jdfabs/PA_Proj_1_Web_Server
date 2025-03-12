@@ -1,12 +1,15 @@
-package core;
+package core/**
+ * A simple HTTP server that listens on a specified port.
+ * It serves files from a predefined server root directory.
+ */;
 
 import config.ServerConfig;
+import logging.Logger;
+import utils.FileService;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * A simple HTTP server that listens on a specified port.
@@ -16,107 +19,62 @@ public class MainHTTPServerThread extends Thread {
 
     private static String SERVER_ROOT = System.getProperty("user.dir"); // Define by user
     private final int port;
-    private ServerSocket server;
+    private final FileService fileService;
+    private final Logger logger;
 
     /**
-     * Constructor to initialize the HTTP server thread with a specified port and set the correct root.
+     * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
      *
-     * @param config all configs on config folder.
+     * @param config      the server configuration containing port and root directory information.
+     * @param fileService the file service used to read file contents.
+     * @param logger      the logger used for logging server events and errors.
      */
-    public MainHTTPServerThread(ServerConfig config) {
-        SERVER_ROOT += config.getRoot();
+    public MainHTTPServerThread(ServerConfig config, FileService fileService, Logger logger) {
         this.port = config.getPort();
+        SERVER_ROOT += config.getRoot();
+        this.fileService = fileService;
+        this.logger = logger;
     }
 
-    /**
-     * Reads a binary file and returns its contents as a byte array.
-     *
-     * @param path The file path to read.
-     * @return A byte array containing the file's contents, or an empty array if an error occurs.
-     */
-    private byte[] readBinaryFile(String path) {
-        try {
-            return Files.readAllBytes(Paths.get(path));
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + path);
-            e.printStackTrace();
-            return new byte[0];
-        }
-    }
 
     /**
-     * Reads a text file and returns its contents as a string.
-     *
-     * @param path The file path to read.
-     * @return A string containing the file's contents, or an empty string if an error occurs.
-     */
-    private String readFile(String path) {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + path);
-            e.printStackTrace();
-        }
-        return content.toString();
-    }
-
-    /**
-     * Starts the HTTP server and listens for incoming client requests.
-     * Processes HTTP GET requests and serves files from the defined server root directory.
+     * Starts the HTTP server.
+     * This method initializes a {@code ServerSocket} on the {@link ServerConfig} port and listens new connections.
+     * On a new connection it's logged and sent to {@code handleClient}.
      */
     @Override
     public void run() {
-        try {
-            server = new ServerSocket(port);
-            System.out.println("Server started on port: " + port);
-            System.out.println("Working Directory: " + System.getProperty("user.dir"));
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            logger.info("Server started on port: " + port);
+            logger.info("Server root: " + SERVER_ROOT);
 
             while (true) {
-                try (Socket client = server.accept();
-                     BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                     OutputStream clientOutput = client.getOutputStream()) {
-
-                    System.out.println("New client connected: " + client);
-
-                    // Read and parse the HTTP request
-                    StringBuilder requestBuilder = new StringBuilder();
-                    String line;
-                    while (!(line = br.readLine()).isBlank()) {
-                        requestBuilder.append(line).append("\r\n");
-                    }
-
-                    String request = requestBuilder.toString();
-                    String[] tokens = request.split(" ");
-                    if (tokens.length < 2) {
-                        System.err.println("Invalid request received.");
-                        continue;
-                    }
-                    String route = tokens[1];
-                    System.out.println("Request received: " + request);
-
-                    // Serve the requested file
-                    byte[] content = readBinaryFile(SERVER_ROOT + route);
-
-                    // Send HTTP response headers
-                    clientOutput.write("HTTP/1.1 200 OK\r\n".getBytes());
-                    clientOutput.write("Content-Type: text/html\r\n".getBytes());
-                    clientOutput.write("\r\n".getBytes());
-
-                    // Send response body
-                    clientOutput.write(content);
-                    clientOutput.write("\r\n\r\n".getBytes());
-                    clientOutput.flush();
-                } catch (IOException e) {
-                    System.err.println("Error handling client request.");
-                    e.printStackTrace();
-                }
+                Socket clientSocket = serverSocket.accept();
+                logger.info("New client connected: " + clientSocket.getInetAddress());
+                handleClient(clientSocket);
             }
         } catch (IOException e) {
-            System.err.println("Server error: Unable to start on port " + port);
+            logger.error("Server error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * This method wraps the client socket's input and output streams in a {@link BufferedReader} and {@link OutputStream}
+     * respectively, then creates a {@link RequestHandler} to process the HTTP request.
+     *
+     * @param clientSocket the client socket.
+     */
+    private void handleClient(Socket clientSocket) {
+        try (Socket socket = clientSocket;
+             BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             OutputStream clientOutput = socket.getOutputStream()) {
+
+            RequestHandler requestHandler = new RequestHandler(br, clientOutput, SERVER_ROOT, fileService, logger);
+            requestHandler.processRequest();
+        } catch (IOException e) {
+            logger.error("Error handling client request: " + e.getMessage());
             e.printStackTrace();
         }
     }
