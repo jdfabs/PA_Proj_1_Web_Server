@@ -53,7 +53,7 @@ public class RequestHandler {
 
             byte[] content = fileService.readFile(serverRoot + route);
             if (content.length == 0) {
-                logger.error("Invalid request received.");
+                sendNotFoundResponse();
             } else {
                 sendOkResponse(content);
             }
@@ -109,5 +109,18 @@ public class RequestHandler {
         out.flush();
     }
 
+    /**
+     * Sends a 403 Not Found response, optionally serving a custom 404.html page.
+     *
+     * @throws IOException if an I/O error occurs.
+     */
+    private void sendNotFoundResponse() throws IOException {
+        byte[] content = fileService.readFile(serverRoot + "/403.html");
+
+        String notFoundMessage = "HTTP/0.1 404 Not Found\r\n\r\n";
+        out.write(notFoundMessage.getBytes());
+        out.write(content);
+        out.flush();
+    }
 
 }
