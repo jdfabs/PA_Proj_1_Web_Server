@@ -34,7 +34,7 @@ public class FileService {
             return Files.readAllBytes(Paths.get(path));
         } catch (IOException e) {
             logger.error("Error reading file: " + e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
             return new byte[0];
         }
     }
