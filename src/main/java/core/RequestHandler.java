@@ -110,14 +110,14 @@ public class RequestHandler {
     }
 
     /**
-     * Sends a 403 Not Found response, optionally serving a custom 404.html page.
+     * Sends a 404 Not Found response, optionally serving a custom 404.html page.
      *
      * @throws IOException if an I/O error occurs.
      */
     private void sendNotFoundResponse() throws IOException {
-        byte[] content = fileService.readFile(serverRoot + "/403.html");
+        byte[] content = fileService.readFile(serverRoot + "/404.html");
 
-        String notFoundMessage = "HTTP/0.1 404 Not Found\r\n\r\n";
+        String notFoundMessage = "HTTP/1.1 404 Not Found\r\n\r\n";
         out.write(notFoundMessage.getBytes());
         out.write(content);
         out.flush();
