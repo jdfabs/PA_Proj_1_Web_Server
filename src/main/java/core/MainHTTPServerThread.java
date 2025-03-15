@@ -1,7 +1,4 @@
-package core/**
- * A simple HTTP server that listens on a specified port.
- * It serves files from a predefined server root directory.
- */;
+package core;
 
 import config.ServerConfig;
 import logging.Logger;
@@ -51,7 +48,9 @@ public class MainHTTPServerThread extends Thread {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 logger.info("New client connected: " + clientSocket.getInetAddress());
-                handleClient(clientSocket);
+
+                //THREAD POOL SHOULD BE IMPLEMENTED HERE, added to test File monitor...
+                new Thread(() -> handleClient(clientSocket)).start();
             }
         } catch (IOException e) {
             logger.error("Server error: " + e.getMessage());
