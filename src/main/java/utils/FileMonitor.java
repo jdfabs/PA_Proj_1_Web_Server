@@ -50,7 +50,7 @@ public class FileMonitor {
         if (lock != null) {
             lock.unlock();
         } else {
-            logger.error("Lock file " + fileName + " was not locked");
+            logger.error("Lock for file \"" + fileName + "\" was not found");
         }
     }
 }
