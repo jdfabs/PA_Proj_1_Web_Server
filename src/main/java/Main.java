@@ -10,7 +10,6 @@ public class Main {
 
         ServerConfig config = null;
         Logger logger = new Logger();
-        FileService fileService = new FileService(logger);
 
         try {
             config = new ServerConfig("server/server.config");
@@ -20,7 +19,7 @@ public class Main {
             System.exit(1);
         }
 
-        MainHTTPServerThread s = new MainHTTPServerThread(config, fileService, logger);
+        MainHTTPServerThread s = new MainHTTPServerThread(config, logger);
         s.start();
         try {
             s.join();

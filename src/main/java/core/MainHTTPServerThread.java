@@ -16,20 +16,17 @@ public class MainHTTPServerThread extends Thread {
 
     private static String SERVER_ROOT = System.getProperty("user.dir"); // Define by user
     private final int port;
-    private final FileService fileService;
     private final Logger logger;
 
     /**
      * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
      *
      * @param config      the server configuration containing port and root directory information.
-     * @param fileService the file service used to read file contents.
      * @param logger      the logger used for logging server events and errors.
      */
-    public MainHTTPServerThread(ServerConfig config, FileService fileService, Logger logger) {
+    public MainHTTPServerThread(ServerConfig config, Logger logger) {
         this.port = config.getPort();
         SERVER_ROOT += config.getRoot();
-        this.fileService = fileService;
         this.logger = logger;
     }
 
@@ -70,7 +67,7 @@ public class MainHTTPServerThread extends Thread {
              BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              OutputStream clientOutput = socket.getOutputStream()) {
 
-            RequestHandler requestHandler = new RequestHandler(br, clientOutput, SERVER_ROOT, fileService, logger);
+            RequestHandler requestHandler = new RequestHandler(br, clientOutput, SERVER_ROOT );
             requestHandler.processRequest();
         } catch (IOException e) {
             logger.error("Error handling client request: " + e.getMessage());
