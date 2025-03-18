@@ -1,9 +1,8 @@
 package core;
 
-import logging.Logger;
-import utils.FileService;
-import utils.HeaderBuilder;
-import utils.RequestValidator;
+import logging.*;
+import utils.*;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,10 +40,10 @@ public class RequestHandler {
     public void processRequest() {
         try {
             String request = readHttpRequest();
-            logger.info("Request received: " + request);
+            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Request received: " + request));
             String route = parseRoute(request);
             if (route == null) {
-                logger.error("Invalid request received.");
+                logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Invalid request received."));
                 return;
             }
 
@@ -68,7 +67,7 @@ public class RequestHandler {
             String header = headerBuilder.getHeader();
 
             if (!isValid) {
-                logger.error("Invalid request.");
+                logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Invalid request"));
                 sendErrorResponse(400, "Bad Request", header);
                 return;
             }
@@ -79,7 +78,7 @@ public class RequestHandler {
                 sendOkResponse(content, header);
             }
         } catch (IOException e) {
-            logger.error("Error processing request: " + e.getMessage());
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
             e.printStackTrace();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -123,7 +122,7 @@ public class RequestHandler {
      * @throws IOException if an I/O error occurs.
      */
     private void sendOkResponse(byte[] content, String headers) throws IOException {
-        logger.info("Response sent.");
+        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Response sent."));
         out.write("HTTP/1.1 200 OK\r\n".getBytes());
         out.write(headers.getBytes());
         out.write("\r\n".getBytes());

@@ -1,6 +1,6 @@
 package utils;
 
-import logging.Logger;
+import logging.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -11,18 +11,14 @@ import java.util.concurrent.locks.ReentrantLock;
  * The {@code FileMonitor} class implements a monitor pattern to ensure exclusive, thread-safe,
  * and FIFO access to files identified by their path,name and extension.
  */
-public class FileMonitor {
+public class FileMonitor implements LogProducer {
 
     private static final ConcurrentHashMap<String, Lock> fileLocks = new ConcurrentHashMap<>();
-    private final Logger logger;
 
     /**
      * Constructs a {@code FileMonitor} with the specified logger.
-     *
-     * @param logger The {@link Logger} instance used to log events.
      */
-    public FileMonitor(Logger logger) {
-        this.logger = logger;
+    public FileMonitor() {
     }
 
     /**
@@ -50,7 +46,7 @@ public class FileMonitor {
         if (lock != null) {
             lock.unlock();
         } else {
-            logger.error("Lock for file \"" + fileName + "\" was not found");
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Lock for file \"" + fileName + "\" was not found"));
         }
     }
 }

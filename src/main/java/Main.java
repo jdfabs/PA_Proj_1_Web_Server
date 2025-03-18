@@ -1,6 +1,9 @@
 import config.ServerConfig;
 import core.MainHTTPServerThread;
+import logging.LogLocation;
+import logging.LogType;
 import logging.Logger;
+import logging.LoggingTask;
 import utils.FileService;
 
 import java.io.IOException;
@@ -10,16 +13,16 @@ public class Main {
 
         ServerConfig config = null;
         Logger logger = new Logger();
+        logger.start();
 
-        try {
-            config = new ServerConfig("server/server.config");
+        config = new ServerConfig("server/server.config");
 
-        } catch (IOException e) {
-            logger.error("Error loading server config: " + e.getMessage());
+        if(config.getRoot() == null) {
+            //Failed to load config
             System.exit(1);
         }
 
-        MainHTTPServerThread s = new MainHTTPServerThread(config, logger);
+        MainHTTPServerThread s = new MainHTTPServerThread(config);
         s.start();
         try {
             s.join();

@@ -37,7 +37,8 @@ public class FileService extends Thread {
             content = Files.readAllBytes(Paths.get(path));
 
             //Faking long tasks
-            System.out.println("Computing extremely hard file reading bip bop");
+
+            logMessage(new LoggingTask(LogType.Test, LogLocation.Console, "Computing extremely hard file reading bip bop"));
             Thread.sleep(new Random().nextInt(500, 9999));
             //Finish Faking long tasks
         } catch (IOException e) {

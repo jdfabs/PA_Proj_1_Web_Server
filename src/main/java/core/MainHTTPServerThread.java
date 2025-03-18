@@ -70,7 +70,7 @@ public class MainHTTPServerThread extends Thread {
             RequestHandler requestHandler = new RequestHandler(br, clientOutput, SERVER_ROOT );
             requestHandler.processRequest();
         } catch (IOException e) {
-            logger.error("Error handling client request: " + e.getMessage());
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error handling client request: " + e.getMessage()));
             e.printStackTrace();
         }
     }
