@@ -1,0 +1,40 @@
+package logging;
+
+
+/**
+ * task that contains all the components of the message to be logged
+ */
+public class LoggingTask {
+
+    private LogType type;
+    private LogLocation location;
+    private String message;
+
+    public LoggingTask(LogType type, LogLocation location, String message) {
+        this.type = type;
+        this.location = location;
+        this.message = message;
+    }
+
+    /**
+     * gets the type of the log
+     *
+     * @return the type of log to be displayed
+     */
+    public LogType getType() {
+        return type;
+    }
+
+    public LogLocation getLocation() {
+        return location;
+    }
+
+    /**
+     * gets the message of the log
+     *
+     * @return the body of the log
+     */
+    public String getMessage() {
+        return message;
+    }
+}
