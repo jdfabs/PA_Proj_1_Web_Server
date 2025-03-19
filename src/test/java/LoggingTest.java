@@ -51,8 +51,11 @@ public class LoggingTest {
 
     @Test
     void testMultipleLogs_BothWorkersShouldWork() throws InterruptedException {
-        TestLogger logger1 = new TestLogger(); //mockito spy didnt help :c, had to create test subclasses
-        TestLogger logger2 = new TestLogger();
+        TestLogger logger1 = new TestLogger("TestLogger1"); //mockito spy didnt help :c, had to create test subclasses
+        TestLogger logger2 = new TestLogger("TestLogger2");
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
 
         logger1.start();
         logger2.start();
@@ -61,16 +64,27 @@ public class LoggingTest {
             SharedBuffer.buffer.add(new LoggingTask(LogType.Info, LogLocation.Console, "message: " + i));
         }
 
-
-        while (!SharedBuffer.buffer.isEmpty()) {
-            TimeUnit.MILLISECONDS.sleep(100);
+        //Trying to directly check output for the new TestLogger name...
+        //Previous tests all working locally but git actions are F*ng me
+        boolean foundLogger1 = false, foundLogger2 = false;
+        int counter = 0; //no no infinite loops
+        while (!foundLogger1 || !foundLogger2 && counter < 1000) { //... intelij is drunk, saying this is allways true
+            String output = outContent.toString();
+            if (!foundLogger1) {
+                foundLogger1 = output.contains("TestLogger1");
+            }
+            if (!foundLogger2) {
+                foundLogger2 = output.contains("TestLogger2");
+            }
+            if (foundLogger1 && foundLogger2) {
+                break;
+            }
+            TimeUnit.MILLISECONDS.sleep(10);
+            counter++;
         }
 
-        // Check that both TestLoggers had their info(String) method called at least once.
-        assertTrue(logger1.getInfoCallCount() > 0, "logger1.info() was not called.");
-        assertTrue(logger2.getInfoCallCount() > 0, "logger2.info() was not called.");
-
-        //Kill Loggers
+        assertTrue(foundLogger1, "Expected log output for TestLogger1 not found.");
+        assertTrue(foundLogger2, "Expected log output for TestLogger2 not found.");
         logger1.interrupt();
         logger2.interrupt();
     }
@@ -78,6 +92,7 @@ public class LoggingTest {
 
     @AfterAll
     static void cleanUp() {
+
         System.setOut(System.out); //output reset
         System.setErr(System.err);
     }
