@@ -61,7 +61,10 @@ public class LoggingTest {
             SharedBuffer.buffer.add(new LoggingTask(LogType.Info, LogLocation.Console, "message: " + i));
         }
 
-        TimeUnit.MILLISECONDS.sleep(200);
+
+        while (!SharedBuffer.buffer.isEmpty()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
 
         // Check that both TestLoggers had their info(String) method called at least once.
         assertTrue(logger1.getInfoCallCount() > 0, "logger1.info() was not called.");
