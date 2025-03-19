@@ -14,7 +14,7 @@ import java.io.OutputStream;
  * <p>
  * Reads the request, serves the requested file, and writes the HTTP response.
  */
-public class RequestHandler {
+public class RequestHandler implements LogProducer{
     private final BufferedReader in;
     private final OutputStream out;
     private final String serverRoot;

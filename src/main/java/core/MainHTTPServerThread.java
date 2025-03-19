@@ -1,7 +1,7 @@
 package core;
 
 import config.ServerConfig;
-import logging.Logger;
+import logging.*;
 import utils.FileService;
 
 import java.io.*;
@@ -12,24 +12,20 @@ import java.net.Socket;
  * A simple HTTP server that listens on a specified port.
  * It serves files from a predefined server root directory.
  */
-public class MainHTTPServerThread extends Thread {
+public class MainHTTPServerThread extends Thread implements LogProducer {
 
     private static String SERVER_ROOT = System.getProperty("user.dir"); // Define by user
     private final int port;
-    private final Logger logger;
 
     /**
      * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
      *
      * @param config      the server configuration containing port and root directory information.
-     * @param logger      the logger used for logging server events and errors.
      */
-    public MainHTTPServerThread(ServerConfig config, Logger logger) {
+    public MainHTTPServerThread(ServerConfig config) {
         this.port = config.getPort();
         SERVER_ROOT += config.getRoot();
-        this.logger = logger;
     }
-
 
     /**
      * Starts the HTTP server.
@@ -39,22 +35,21 @@ public class MainHTTPServerThread extends Thread {
     @Override
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            logger.info("Server started on port: " + port);
-            logger.info("Server root: " + SERVER_ROOT);
+            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server started on port: " + port));
+            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server root: " + SERVER_ROOT ));
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                logger.info("New client connected: " + clientSocket.getInetAddress());
+                logMessage(new LoggingTask(LogType.Info, LogLocation.Console,"New client connected: " + clientSocket.getInetAddress() ));
 
                 //THREAD POOL SHOULD BE IMPLEMENTED HERE, added to test File monitor...
                 new Thread(() -> handleClient(clientSocket)).start();
             }
         } catch (IOException e) {
-            logger.error("Server error: " + e.getMessage());
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Server error: " + e.getMessage()));
             e.printStackTrace();
         }
     }
-
 
     /**
      * This method wraps the client socket's input and output streams in a {@link BufferedReader} and {@link OutputStream}
@@ -71,7 +66,6 @@ public class MainHTTPServerThread extends Thread {
             requestHandler.processRequest();
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error handling client request: " + e.getMessage()));
-            e.printStackTrace();
         }
     }
 }

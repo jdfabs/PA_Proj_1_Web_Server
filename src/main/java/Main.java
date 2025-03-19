@@ -1,12 +1,6 @@
 import config.ServerConfig;
 import core.MainHTTPServerThread;
-import logging.LogLocation;
-import logging.LogType;
 import logging.Logger;
-import logging.LoggingTask;
-import utils.FileService;
-
-import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
