@@ -1,11 +1,15 @@
 import config.ServerConfig;
+import logging.LogLocation;
+import logging.LogType;
+import logging.LoggingTask;
+import logging.SharedBuffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ServerConfigTest {
 
@@ -15,6 +19,7 @@ class ServerConfigTest {
     void setUp() throws IOException {
         // Load config file for tests (from src/test/resources)
         config = new ServerConfig("src/test/java/resources/server.config");
+        SharedBuffer.buffer.clear();
     }
 
     @Test
@@ -48,9 +53,16 @@ class ServerConfigTest {
     }
 
     @Test
-    void testInvalidFileThrowsIOException() {
-        assertThrows(IOException.class, () -> {
-            new ServerConfig("invalid/path/to/config.file");
-        });
+    void testInvalidFileThrowsIOException() throws InterruptedException { //implementation changed with Logger - now logs the message! :D
+
+        new ServerConfig("invalid/path/to/config.file");
+
+        TimeUnit.MILLISECONDS.sleep(100);
+
+        LoggingTask nextLog = SharedBuffer.buffer.remove();
+        assertTrue(nextLog.getMessage().contains("Error loading server config: "));
+        assertEquals(LogType.Error, nextLog.getType());
+        assertEquals(LogLocation.Console, nextLog.getLocation());
+
     }
 }

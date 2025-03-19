@@ -13,14 +13,12 @@ class RequestHandlerTest {
 
     private FileService fileService;
     private FileService fileService404;
-    private Logger logger;
     private ByteArrayOutputStream clientOutput;
 
     @BeforeEach
     void setup() {
         fileService = mock(FileService.class);  // Mock FileService
         fileService404 = mock(FileService.class);
-        logger = mock(Logger.class);            // Mock Logger
         clientOutput = new ByteArrayOutputStream(); // Output stream to capture responses
     }
 
