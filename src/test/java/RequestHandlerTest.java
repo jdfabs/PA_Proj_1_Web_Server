@@ -1,5 +1,4 @@
 import core.RequestHandler;
-import logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.FileService;

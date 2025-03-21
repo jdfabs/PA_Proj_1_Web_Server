@@ -1,7 +1,4 @@
-import logging.Logger;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import utils.FileService;
 
 import java.io.IOException;
@@ -9,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class FileServiceTest {
 
@@ -48,7 +44,6 @@ class FileServiceTest {
 
         // Assert
         assertEquals(0, result.length);
-        //verify(mockLogger, times(1)).error(contains("Error reading file"));
     }
 
     @Test
