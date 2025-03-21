@@ -11,9 +11,9 @@ public class LoggingTask {
     private final String message;
 
     public LoggingTask(LogType type, LogLocation location, String message) {
-        this.type = type;
-        this.location = location;
-        this.message = message;
+        this.type = type == null ? LogType.Info : type;
+        this.location = location == null? LogLocation.Console : location;
+        this.message = message == null ? "" : message;
     }
 
     /**
