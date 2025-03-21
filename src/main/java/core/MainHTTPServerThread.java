@@ -2,7 +2,6 @@ package core;
 
 import config.ServerConfig;
 import logging.*;
-import utils.FileService;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -14,7 +13,7 @@ import java.net.Socket;
  */
 public class MainHTTPServerThread extends Thread implements LogProducer {
 
-    private static String SERVER_ROOT = System.getProperty("user.dir"); // Define by user
+    private static String webRoot = System.getProperty("user.dir"); // Define by user
     private final int port;
 
     /**
@@ -24,7 +23,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      */
     public MainHTTPServerThread(ServerConfig config) {
         this.port = config.getPort();
-        SERVER_ROOT += config.getRoot();
+        webRoot += config.getDocumentRoot();
     }
 
     /**
@@ -36,7 +35,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server started on port: " + port));
-            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server root: " + SERVER_ROOT ));
+            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server root: " + webRoot));
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -62,7 +61,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
              BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              OutputStream clientOutput = socket.getOutputStream()) {
 
-            RequestHandler requestHandler = new RequestHandler(br, clientOutput, SERVER_ROOT );
+            RequestHandler requestHandler = new RequestHandler(br, clientOutput, webRoot);
             requestHandler.processRequest();
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error handling client request: " + e.getMessage()));
