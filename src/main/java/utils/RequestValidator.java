@@ -1,8 +1,13 @@
 package utils;
 
+import logging.LogLocation;
+import logging.LogProducer;
+import logging.LogType;
+import logging.LoggingTask;
+
 import java.util.Random;
 
-public class RequestValidator extends Thread {
+public class RequestValidator extends Thread implements LogProducer {
     private String request;
     private boolean isValidRequest;
 
@@ -15,12 +20,13 @@ public class RequestValidator extends Thread {
         isValidRequest = request.startsWith("GET") && request.split(" ").length >= 2;
 
         //Faking long tasks
-        System.out.println("Computing extremely hard validation request bip bop");
+        logMessage(new LoggingTask(LogType.Info, LogLocation.Console,"Computing extremely hard validation request bip bop" ));
         try {
             Thread.sleep(new Random().nextInt(500,9999));
         } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
         }
+        //Finish Faking long tasks
     }
 
     public boolean getIsValidRequest() {
