@@ -16,7 +16,7 @@ class ServerConfigTest {
     private ServerConfig config;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         // Load config file for tests (from src/test/resources)
         config = new ServerConfig("src/test/java/resources/server.config");
         SharedBuffer.buffer.clear();

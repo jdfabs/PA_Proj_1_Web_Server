@@ -22,7 +22,7 @@ class RequestHandlerTest {
     }
 
     @Test
-    void shouldRespond404WhenFileDoesNotExist() throws IOException {
+    void shouldRespond404WhenFileDoesNotExist() {
         // Arrange
         String httpRequest = "GET /missing.html HTTP/1.1\r\n\r\n";
 

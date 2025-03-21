@@ -18,8 +18,6 @@ public class RequestHandler implements LogProducer {
     private final BufferedReader in;
     private final OutputStream out;
     private final String serverRoot;
-    private final static Logger logger = new Logger();
-
 
     /**
      * Constructs a RequestHandler with necessary dependencies.

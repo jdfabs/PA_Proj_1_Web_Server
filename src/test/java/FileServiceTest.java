@@ -36,7 +36,7 @@ class FileServiceTest {
         String nonExistentFilePath = "non_existent_file.txt";
 
         // Act
-        FileService fileService = new FileService(nonExistentFilePath.toString());
+        FileService fileService = new FileService(nonExistentFilePath);
         fileService.start();
         fileService.join();
 

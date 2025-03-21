@@ -13,7 +13,6 @@ import java.util.Random;
  * It is responsible for handling file operations.
  */
 public class FileService extends Thread implements LogProducer {
-    private static final Logger logger = new Logger();
     private static final FileMonitor fileMonitor = new FileMonitor();
     private final String path;
     private byte[] content;
