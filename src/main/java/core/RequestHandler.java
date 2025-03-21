@@ -77,7 +77,6 @@ public class RequestHandler implements LogProducer {
             }
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
-            e.printStackTrace();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

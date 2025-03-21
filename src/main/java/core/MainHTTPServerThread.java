@@ -46,7 +46,6 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
             }
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Server error: " + e.getMessage()));
-            e.printStackTrace();
         }
     }
 
