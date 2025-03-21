@@ -2,17 +2,22 @@ package logging;
 
 import com.sun.jdi.InvalidTypeException;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * A logger that prints log messages.
  * This class will later be expanded to log to the log file!!
  */
-public class Logger extends Thread implements SharedBuffer {
+public class Logger extends Thread implements SharedBuffer , LogProducer{
     private volatile boolean running = true;
 
     public void run() {
         while (running) {
             try {
-                LoggingTask loggingTask = buffer.poll();
+                LoggingTask loggingTask = buffer.poll(100, TimeUnit.MILLISECONDS);
+
+                if (loggingTask == null) continue;
+
                 switch (loggingTask.getType()) {
                     case Info:
                         info(loggingTask.getMessage());
@@ -26,8 +31,8 @@ public class Logger extends Thread implements SharedBuffer {
                     default:
                         throw new InvalidTypeException();
                 }
-            } catch (InvalidTypeException e) {
-                //TODO
+            } catch (InvalidTypeException | InterruptedException e) {
+                logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
             }
         }
     }
