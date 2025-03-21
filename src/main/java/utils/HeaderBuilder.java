@@ -13,9 +13,11 @@ public class HeaderBuilder extends Thread implements LogProducer {
     private final StringBuilder headerBuilder = new StringBuilder();
 
     public void run() {
-        headerBuilder.append("Content-Type: text/html\r\n")
-                .append("Server: pa-web-server\r\n")
-                .append("Date: " + new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(new Date()) + "\r\n");
+        headerBuilder.append("Content-Type: text/html\r\n");
+        headerBuilder.append("Server: pa-web-server\r\n");
+        headerBuilder.append("Date: ");
+        headerBuilder.append(new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(new Date()));
+        headerBuilder.append("\r\n");
 
         //Faking long tasks
         logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Computing extremely hard header bip bop"));
