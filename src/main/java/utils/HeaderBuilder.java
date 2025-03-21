@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Random;
 
 public class HeaderBuilder extends Thread implements LogProducer {
-    private StringBuilder headerBuilder = new StringBuilder();
+    private final StringBuilder headerBuilder = new StringBuilder();
 
     public void run() {
         headerBuilder.append("Content-Type: text/html\r\n")

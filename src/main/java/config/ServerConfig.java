@@ -8,15 +8,14 @@ import java.io.FileInputStream;
 
 
 public class ServerConfig implements LogProducer {
-    private Properties properties = new Properties();
+    private final Properties properties = new Properties();
 
     public ServerConfig(String filePath) {
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream(filePath);
+            FileInputStream fis = new FileInputStream(filePath);
             properties.load(fis);
             fis.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error loading server config: " + e.getMessage()));
         }
 

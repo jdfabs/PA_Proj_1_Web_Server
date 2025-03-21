@@ -8,7 +8,7 @@ import logging.LoggingTask;
 import java.util.Random;
 
 public class RequestValidator extends Thread implements LogProducer {
-    private String request;
+    private final String request;
     private boolean isValidRequest;
 
     public RequestValidator(String request) {

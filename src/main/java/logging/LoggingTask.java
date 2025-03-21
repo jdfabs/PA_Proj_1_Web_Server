@@ -6,9 +6,9 @@ package logging;
  */
 public class LoggingTask {
 
-    private LogType type;
-    private LogLocation location;
-    private String message;
+    private final LogType type;
+    private final LogLocation location;
+    private final String message;
 
     public LoggingTask(LogType type, LogLocation location, String message) {
         this.type = type;

@@ -26,7 +26,7 @@ public class Logger extends Thread implements SharedBuffer {
                     default:
                         throw new InvalidTypeException();
                 }
-            } catch (Exception e) {
+            } catch (InvalidTypeException e) {
                 //TODO
             }
         }
