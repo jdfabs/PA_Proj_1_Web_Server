@@ -19,7 +19,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
     /**
      * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
      *
-     * @param config      the server configuration containing port and root directory information.
+     * @param config the server configuration containing port and root directory information.
      */
     public MainHTTPServerThread(ServerConfig config) {
         this.port = config.getPort();
@@ -39,7 +39,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                logMessage(new LoggingTask(LogType.Info, LogLocation.Console,"New client connected: " + clientSocket.getInetAddress() ));
+                logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "New client connected: " + clientSocket.getInetAddress()));
 
                 //THREAD POOL SHOULD BE IMPLEMENTED HERE, added to test File monitor...
                 new Thread(() -> handleClient(clientSocket)).start();

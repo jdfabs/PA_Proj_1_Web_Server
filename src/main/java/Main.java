@@ -11,7 +11,7 @@ public class Main {
 
         config = new ServerConfig("server/server.config");
 
-        if(config.getRoot() == null) {
+        if (config.getRoot() == null) {
             //Failed to load config
             System.exit(1);
         }

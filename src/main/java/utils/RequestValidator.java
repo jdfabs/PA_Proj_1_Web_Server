@@ -20,9 +20,9 @@ public class RequestValidator extends Thread implements LogProducer {
         isValidRequest = request.startsWith("GET") && request.split(" ").length >= 2;
 
         //Faking long tasks
-        logMessage(new LoggingTask(LogType.Info, LogLocation.Console,"Computing extremely hard validation request bip bop" ));
+        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Computing extremely hard validation request bip bop"));
         try {
-            Thread.sleep(new Random().nextInt(500,9999));
+            Thread.sleep(new Random().nextInt(500, 9999));
         } catch (InterruptedException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
         }
@@ -30,6 +30,6 @@ public class RequestValidator extends Thread implements LogProducer {
     }
 
     public boolean getIsValidRequest() {
-        return isValidRequest ;
+        return isValidRequest;
     }
 }

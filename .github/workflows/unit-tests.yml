@@ -2,9 +2,9 @@ name: Test JAVA project on different OS
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [ main, develop ]
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
 
 jobs:
   unit-tests:

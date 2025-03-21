@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - main
-      
+
 jobs:
   docs-coverage:
     runs-on: ubuntu-latest

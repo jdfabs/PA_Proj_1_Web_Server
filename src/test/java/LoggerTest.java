@@ -103,7 +103,8 @@ public class LoggerTest {
 
     @Test
     public void testLogProducerDefaultMethod() throws InterruptedException {
-        LogProducer producer = new LogProducer() {}; //Generic instance of the interface
+        LogProducer producer = new LogProducer() {
+        }; //Generic instance of the interface
 
         LoggingTask task = new LoggingTask(LogType.Warning, LogLocation.Console, "Producer message");
         producer.logMessage(task);

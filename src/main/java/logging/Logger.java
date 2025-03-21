@@ -9,9 +9,9 @@ import com.sun.jdi.InvalidTypeException;
 public class Logger extends Thread implements SharedBuffer {
     private volatile boolean running = true;
 
-    public void run(){
+    public void run() {
         while (running) {
-            try{
+            try {
                 LoggingTask loggingTask = buffer.poll();
                 switch (loggingTask.getType()) {
                     case Info:
@@ -26,12 +26,11 @@ public class Logger extends Thread implements SharedBuffer {
                     default:
                         throw new InvalidTypeException();
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 //TODO
             }
         }
     }
-
 
 
     /**
