@@ -5,9 +5,12 @@ import logging.Logger;
 public class Main {
     public static void main(String[] args) {
 
-        ServerConfig config = null;
-        Logger logger = new Logger();
-        logger.start();
+        ServerConfig config;
+        Logger logger1 = new Logger();
+        logger1.start();
+
+        Logger logger2 = new Logger();
+        logger2.start();
 
         config = new ServerConfig("server/server.config");
 
