@@ -7,6 +7,7 @@ import utils.FileService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,18 +25,7 @@ class FileServiceTest {
     @Test
     void testReadFile_Success() throws IOException, InterruptedException {
         // Arrange
-        String expectedContent = "<!DOCTYPE html>\n" +
-                "<html lang=\"en-GB\">\n" +
-                "<head>\n" +
-                "    <title>HOME</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "\n" +
-                "<h1>Welcome to PA Website</h1>\n" +
-                "<p>This is the index.html file</p>\n" +
-                "\n" +
-                "</body>\n" +
-                "</html>";
+        byte[] expectedContent = Files.readAllBytes(Paths.get(config.getDocumentRoot() +"/"+ config.getDefaultPageFile()+ "." + config.getDefaultPageExtension()));
 
         // Act
         FileService fileService = new FileService(config,"/");
@@ -45,7 +35,7 @@ class FileServiceTest {
         byte[] result = fileService.getContent();
 
         // Assert
-        assertArrayEquals(expectedContent.getBytes(), result);
+        assertArrayEquals(expectedContent, result);
 
     }
 
