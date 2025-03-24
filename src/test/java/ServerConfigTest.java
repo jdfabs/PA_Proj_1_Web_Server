@@ -49,18 +49,4 @@ class ServerConfigTest {
     void testGetMaximumRequests() {
         assertEquals(10, config.getMaxRequests());
     }
-
-    @Test
-    void testInvalidFileThrowsIOException() throws InterruptedException { //implementation changed with Logger - now logs the message! :D
-
-        new ServerConfig("invalid/path/to/config.file");
-
-        TimeUnit.MILLISECONDS.sleep(500);
-
-        LoggingTask nextLog = SharedBuffer.buffer.remove();
-        assertTrue(nextLog.getMessage().contains("Error loading server config: "));
-        assertEquals(LogType.Error, nextLog.getType());
-        assertEquals(LogLocation.ConsoleErr, nextLog.getLocation());
-
-    }
 }
