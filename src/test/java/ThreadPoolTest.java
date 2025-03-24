@@ -1,5 +1,3 @@
-package resources;
-
 import core.ThreadPool;
 import core.WorkerThread;
 import org.junit.jupiter.api.Test;
