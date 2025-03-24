@@ -24,9 +24,18 @@ class FileServiceTest {
     @Test
     void testReadFile_Success() throws IOException, InterruptedException {
         // Arrange
-        Path tempFile = Files.createTempFile("testFile", ".txt");
-        String expectedContent = "Hello, World!";
-        Files.write(tempFile, expectedContent.getBytes());
+        String expectedContent = "<!DOCTYPE html>\n" +
+                "<html lang=\"en-GB\">\n" +
+                "<head>\n" +
+                "    <title>HOME</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "\n" +
+                "<h1>Welcome to PA Website</h1>\n" +
+                "<p>This is the index.html file</p>\n" +
+                "\n" +
+                "</body>\n" +
+                "</html>";
 
         // Act
         FileService fileService = new FileService(config,"/");
@@ -38,8 +47,6 @@ class FileServiceTest {
         // Assert
         assertArrayEquals(expectedContent.getBytes(), result);
 
-        // Cleanup
-        Files.deleteIfExists(tempFile);
     }
 
     @Test

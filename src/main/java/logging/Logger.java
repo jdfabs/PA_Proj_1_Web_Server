@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * A logger that prints log messages.
  * This class will later be expanded to log to the log file!!
  */
-public class Logger extends Thread implements SharedBuffer , LogProducer{
+public class Logger extends Thread implements SharedBuffer, LogProducer {
     private volatile boolean running = true;
     private final String logPath;
 
@@ -27,13 +27,13 @@ public class Logger extends Thread implements SharedBuffer , LogProducer{
 
                 switch (loggingTask.getType()) {
                     case Info:
-                        info(loggingTask.getMessage());
+                        info(loggingTask.getLocation(), loggingTask.getMessage());
                         break;
                     case Error:
-                        error(loggingTask.getMessage());
+                        error(loggingTask.getLocation(), loggingTask.getMessage());
                         break;
                     case Warning:
-                        warning(loggingTask.getMessage());
+                        warning(loggingTask.getLocation(), loggingTask.getMessage());
                         break;
                     default:
                         throw new InvalidTypeException();
@@ -50,8 +50,10 @@ public class Logger extends Thread implements SharedBuffer , LogProducer{
      *
      * @param message The message which will be on the log
      */
-    private void info(String message) {
-        System.out.println("[INFO] " + message);
+    private void info(LogLocation location, String message) {
+        String logMessage = "[INFO] " + message;
+
+        logToLocation(location, logMessage);
     }
 
     /**
@@ -59,8 +61,10 @@ public class Logger extends Thread implements SharedBuffer , LogProducer{
      *
      * @param message The message which will be on the log
      */
-    private void error(String message) {
-        System.err.println("[ERROR] " + message);
+    private void error(LogLocation location, String message) {
+        String logMessage = "[ERROR] " + message;
+
+        logToLocation(location, logMessage);
     }
 
     /**
@@ -68,8 +72,38 @@ public class Logger extends Thread implements SharedBuffer , LogProducer{
      *
      * @param message The message which will be on the log
      */
-    private void warning(String message) {
-        System.err.println("[WARNING] " + message);
+    private void warning(LogLocation location, String message) {
+        String logMessage = "[WARNING] " + message;
+
+        logToLocation(location, logMessage);
+    }
+
+    private void logToLocation(LogLocation location, String message) {
+        switch (location) {
+            case ConsoleOut:
+                logConsoleOut(message);
+                break;
+            case ConsoleErr:
+                logConsoleErr(message);
+                break;
+            case File:
+                logFile(message);
+                break;
+            default:
+                System.err.println("Invalid log location: " + location + " message: " + message);
+        }
+    }
+
+    private void logConsoleOut(String message) {
+        System.out.println(message);
+    }
+
+    private void logConsoleErr(String message) {
+        System.err.println(message);
+    }
+
+    private void logFile(String message) {
+
     }
 
     /**
