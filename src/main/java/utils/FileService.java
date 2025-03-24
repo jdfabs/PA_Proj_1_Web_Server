@@ -20,8 +20,9 @@ public class FileService extends Thread implements LogProducer {
     /**
      * Constructor to initialize {@code FileService} instance with the specified logger.
      */
-    public FileService(String path) {
-        this.path = path;
+    public FileService(String webRoot,String path) {
+        if (path.equals("/")) path += "index.html";
+        this.path = webRoot + path;
     }
 
     /**
@@ -41,7 +42,7 @@ public class FileService extends Thread implements LogProducer {
         } finally {
             fileMonitor.unlockFile(path);
         }
-        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "DONE READING FILE"));
+        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "DONE READING FILE: " + path));
     }
 
     /**

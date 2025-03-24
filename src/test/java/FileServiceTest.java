@@ -17,7 +17,7 @@ class FileServiceTest {
         Files.write(tempFile, expectedContent.getBytes());
 
         // Act
-        FileService fileService = new FileService(tempFile.toString());
+        FileService fileService = new FileService("",tempFile.toString());
         fileService.start();
         fileService.join();
 
@@ -36,7 +36,7 @@ class FileServiceTest {
         String nonExistentFilePath = "non_existent_file.txt";
 
         // Act
-        FileService fileService = new FileService(nonExistentFilePath);
+        FileService fileService = new FileService("",nonExistentFilePath);
         fileService.start();
         fileService.join();
 
@@ -52,7 +52,7 @@ class FileServiceTest {
         Path tempFile = Files.createTempFile("emptyFile", ".txt");
 
         // Act
-        FileService fileService = new FileService(tempFile.toString());
+        FileService fileService = new FileService("",tempFile.toString());
         fileService.start();
         fileService.join();
 

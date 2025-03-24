@@ -45,7 +45,7 @@ public class RequestHandler implements LogProducer {
                 return;
             }
 
-            FileService fileService = new FileService(serverRoot + route);
+            FileService fileService = new FileService(serverRoot, route);
             RequestValidator requestValidator = new RequestValidator(request);
             HeaderBuilder headerBuilder = new HeaderBuilder();
 
@@ -137,7 +137,7 @@ public class RequestHandler implements LogProducer {
      */
     private void sendNotFoundResponse(String headers) throws IOException, InterruptedException {
         // Create and start a FileService thread to read the custom 404 page.
-        FileService fileService = new FileService(serverRoot + "/404.html");
+        FileService fileService = new FileService(serverRoot , "/404.html");
         fileService.start();
         fileService.join();
         byte[] content = fileService.getContent();
