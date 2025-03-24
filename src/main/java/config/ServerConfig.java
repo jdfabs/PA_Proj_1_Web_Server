@@ -16,7 +16,7 @@ public class ServerConfig implements LogProducer {
             properties.load(fis);
             fis.close();
         } catch (IOException e) {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error loading server config: " + e.getMessage()));
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error loading server config: " + e.getMessage()));
         }
 
     }

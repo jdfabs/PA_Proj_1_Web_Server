@@ -39,7 +39,7 @@ public class Logger extends Thread implements SharedBuffer , LogProducer{
                         throw new InvalidTypeException();
                 }
             } catch (InvalidTypeException | InterruptedException e) {
-                logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
+                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
             }
         }
     }

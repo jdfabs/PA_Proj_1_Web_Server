@@ -1,6 +1,7 @@
 package logging;
 
 public enum LogLocation {
-    Console,
+    ConsoleOut,
+    ConsoleErr,
     File,
 }

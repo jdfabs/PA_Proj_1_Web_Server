@@ -36,12 +36,12 @@ public class FileService extends Thread implements LogProducer {
             content = Files.readAllBytes(Paths.get(path));
 
         } catch (IOException e) {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error reading file: " + e.getMessage()));
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error reading file: " + e.getMessage()));
             content = new byte[0];
         } finally {
             fileMonitor.unlockFile(path);
         }
-        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "DONE READING FILE: " + path));
+        logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "DONE READING FILE: " + path));
     }
 
     /**

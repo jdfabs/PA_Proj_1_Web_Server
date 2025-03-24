@@ -12,7 +12,7 @@ public class LoggingTask {
 
     public LoggingTask(LogType type, LogLocation location, String message) {
         this.type = type == null ? LogType.Info : type;
-        this.location = location == null? LogLocation.Console : location;
+        this.location = location == null? LogLocation.ConsoleOut : location;
         this.message = message == null ? "" : message;
     }
 

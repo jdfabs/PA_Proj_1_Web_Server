@@ -36,13 +36,13 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "New client connected: " + clientSocket.getInetAddress()));
+                logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "New client connected: " + clientSocket.getInetAddress()));
 
                 //THREAD POOL SHOULD BE IMPLEMENTED HERE, added to test File monitor...
                 new Thread(() -> handleClient(clientSocket)).start();
             }
         } catch (IOException e) {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Server error: " + e.getMessage()));
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server error: " + e.getMessage()));
         }
     }
 
@@ -60,7 +60,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
             RequestHandler requestHandler = new RequestHandler(br, clientOutput, serverConfig);
             requestHandler.processRequest();
         } catch (IOException e) {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error handling client request: " + e.getMessage()));
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error handling client request: " + e.getMessage()));
         }
     }
 }

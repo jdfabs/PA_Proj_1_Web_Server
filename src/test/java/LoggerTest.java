@@ -37,7 +37,7 @@ public class LoggerTest {
         Logger logger = new Logger();
         logger.start();
 
-        LoggingTask task = new LoggingTask(LogType.Info, LogLocation.Console, "Test info message");
+        LoggingTask task = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Test info message");
 
         SharedBuffer.buffer.add(task);
 
@@ -57,7 +57,7 @@ public class LoggerTest {
         Logger logger = new Logger();
         logger.start();
 
-        LoggingTask task = new LoggingTask(LogType.Error, LogLocation.Console, "Test error message");
+        LoggingTask task = new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Test error message");
 
         SharedBuffer.buffer.add(task);
 
@@ -77,7 +77,7 @@ public class LoggerTest {
         Logger logger = new Logger();
         logger.start();
 
-        LoggingTask task = new LoggingTask(LogType.Warning, LogLocation.Console, "Test warning message");
+        LoggingTask task = new LoggingTask(LogType.Warning, LogLocation.ConsoleErr, "Test warning message");
 
         SharedBuffer.buffer.add(task);
 
@@ -94,10 +94,10 @@ public class LoggerTest {
 
     @Test
     public void testLoggingTaskGetters() {
-        LoggingTask task = new LoggingTask(LogType.Info, LogLocation.Console, "Task message");
+        LoggingTask task = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Task message");
 
         assertEquals(LogType.Info, task.getType());
-        assertEquals(LogLocation.Console, task.getLocation());
+        assertEquals(LogLocation.ConsoleOut, task.getLocation());
         assertEquals("Task message", task.getMessage());
     }
 
@@ -106,10 +106,8 @@ public class LoggerTest {
         LogProducer producer = new LogProducer() {
         }; //Generic instance of the interface
 
-        LoggingTask task = new LoggingTask(LogType.Warning, LogLocation.Console, "Producer message");
+        LoggingTask task = new LoggingTask(LogType.Warning, LogLocation.ConsoleErr, "Producer message");
         producer.logMessage(task);
-
-        TimeUnit.MILLISECONDS.sleep(100);
 
         assertTrue(SharedBuffer.buffer.contains(task));
     }
@@ -120,7 +118,7 @@ public class LoggerTest {
         logger.start();
 
         for (int i = 0; i < 10; i++) {
-            LoggingTask task = new LoggingTask(LogType.Info, LogLocation.Console, "Run method test " + i);
+            LoggingTask task = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Run method test " + i);
             SharedBuffer.buffer.add(task);
 
             TimeUnit.MILLISECONDS.sleep(100);

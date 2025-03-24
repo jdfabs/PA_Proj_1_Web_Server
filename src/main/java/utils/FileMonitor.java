@@ -46,7 +46,7 @@ public class FileMonitor implements LogProducer {
         if (lock != null) {
             lock.unlock();
         } else {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Lock for file \"" + fileName + "\" was not found"));
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Lock for file \"" + fileName + "\" was not found"));
         }
     }
 }

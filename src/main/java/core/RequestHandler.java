@@ -38,10 +38,10 @@ public class RequestHandler implements LogProducer {
     public void processRequest() {
         try {
             String request = readHttpRequest();
-            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Request received: " + request));
+            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Request received: " + request));
             String route = parseRoute(request);
             if (route == null) {
-                logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Invalid request received."));
+                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Invalid request received."));
                 return;
             }
 
@@ -65,7 +65,7 @@ public class RequestHandler implements LogProducer {
             String header = headerBuilder.getHeader();
 
             if (!isValid) {
-                logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Invalid request"));
+                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Invalid request"));
                 sendErrorResponse(400, "Bad Request", header);
                 return;
             }
@@ -76,7 +76,7 @@ public class RequestHandler implements LogProducer {
                 sendOkResponse(content, header);
             }
         } catch (IOException e) {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -119,7 +119,7 @@ public class RequestHandler implements LogProducer {
      * @throws IOException if an I/O error occurs.
      */
     private void sendOkResponse(byte[] content, String headers) throws IOException {
-        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Response sent."));
+        logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Response sent."));
         out.write("HTTP/1.1 200 OK\r\n".getBytes());
         out.write(headers.getBytes());
         out.write("\r\n".getBytes());
