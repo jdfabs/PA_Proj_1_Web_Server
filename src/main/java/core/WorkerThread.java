@@ -57,7 +57,7 @@ public class WorkerThread extends Thread implements LogProducer {
                 break;
             } catch (Exception e) {
                 // Error log if task fails
-                logMessage(new LoggingTask(LogType.Error, LogLocation.Console,
+                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr,
                         "Task execution error: " + e.getMessage()));
             }
         }

@@ -13,6 +13,7 @@ import java.net.Socket;
  */
 public class MainHTTPServerThread extends Thread implements LogProducer {
     private final ServerConfig serverConfig;
+    private final ThreadPool threadPool;
 
     /**
      * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
@@ -21,6 +22,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      */
     public MainHTTPServerThread(ServerConfig config) {
         this.serverConfig = config;
+        this.threadPool = new ThreadPool(5);
     }
 
     /**
@@ -38,8 +40,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
                 Socket clientSocket = serverSocket.accept();
                 logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "New client connected: " + clientSocket.getInetAddress()));
 
-                //THREAD POOL SHOULD BE IMPLEMENTED HERE, added to test File monitor...
-                new Thread(() -> handleClient(clientSocket)).start();
+                threadPool.execute(() -> handleClient(clientSocket));
             }
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server error: " + e.getMessage()));
