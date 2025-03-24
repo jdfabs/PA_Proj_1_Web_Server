@@ -1,13 +1,9 @@
 package utils;
 
-import logging.LogLocation;
 import logging.LogProducer;
-import logging.LogType;
-import logging.LoggingTask;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 
 public class HeaderBuilder extends Thread implements LogProducer {
     private final StringBuilder headerBuilder = new StringBuilder();

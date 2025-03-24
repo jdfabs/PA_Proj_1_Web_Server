@@ -1,11 +1,6 @@
 package utils;
 
-import logging.LogLocation;
 import logging.LogProducer;
-import logging.LogType;
-import logging.LoggingTask;
-
-import java.util.Random;
 
 public class RequestValidator extends Thread implements LogProducer {
     private final String request;
