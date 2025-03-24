@@ -1,3 +1,4 @@
+import config.ServerConfig;
 import logging.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +18,14 @@ public class LoggerTest {
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
+    private ServerConfig config;
+
 
     @BeforeEach
     public void setup() {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
-
+        config = new ServerConfig("src/test/java/resources/server.config");
         SharedBuffer.buffer.clear();
     }
 
@@ -34,7 +37,7 @@ public class LoggerTest {
 
     @Test
     public void testInfoMethod() throws InterruptedException {
-        Logger logger = new Logger();
+        Logger logger = new Logger(config);
         logger.start();
 
         LoggingTask task = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Test info message");
@@ -54,7 +57,7 @@ public class LoggerTest {
 
     @Test
     public void testErrorMethod() throws InterruptedException {
-        Logger logger = new Logger();
+        Logger logger = new Logger(config);
         logger.start();
 
         LoggingTask task = new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Test error message");
@@ -74,7 +77,7 @@ public class LoggerTest {
 
     @Test
     public void testWarningMethod() throws InterruptedException {
-        Logger logger = new Logger();
+        Logger logger = new Logger(config);
         logger.start();
 
         LoggingTask task = new LoggingTask(LogType.Warning, LogLocation.ConsoleErr, "Test warning message");
@@ -114,7 +117,7 @@ public class LoggerTest {
 
     @Test
     public void testLoggerRunMethod() throws InterruptedException {
-        Logger logger = new Logger();
+        Logger logger = new Logger(config);
         logger.start();
 
         for (int i = 0; i < 10; i++) {
