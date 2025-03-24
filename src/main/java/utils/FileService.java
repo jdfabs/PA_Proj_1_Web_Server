@@ -35,15 +35,8 @@ public class FileService extends Thread implements LogProducer {
         try {
             content = Files.readAllBytes(Paths.get(path));
 
-            //Faking long tasks
-            logMessage(new LoggingTask(LogType.Test, LogLocation.Console, "Computing extremely hard file reading bip bop"));
-            Thread.sleep(new Random().nextInt(500, 9999));
-            //Finish Faking long tasks
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error reading file: " + e.getMessage()));
-            content = new byte[0];
-        } catch (InterruptedException e) {
-            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
             content = new byte[0];
         } finally {
             fileMonitor.unlockFile(path);
