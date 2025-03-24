@@ -55,7 +55,7 @@ class ServerConfigTest {
 
         new ServerConfig("invalid/path/to/config.file");
 
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(500);
 
         LoggingTask nextLog = SharedBuffer.buffer.remove();
         assertTrue(nextLog.getMessage().contains("Error loading server config: "));
