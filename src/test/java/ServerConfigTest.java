@@ -22,7 +22,7 @@ class ServerConfigTest {
 
     @Test
     void testGetRoot() {
-        assertEquals("/home/skipper/Documents/GitHub/PA-Proj-1/PA_Proj_1_Web_Server/test_html/", config.getRoot());
+        assertEquals(System.getProperty("user.dir")+"/test_html/", config.getRoot());
     }
 
     @Test
