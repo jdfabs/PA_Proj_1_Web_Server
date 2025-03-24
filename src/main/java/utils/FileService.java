@@ -3,6 +3,7 @@ package utils;
 import config.ServerConfig;
 import logging.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,9 +21,16 @@ public class FileService extends Thread implements LogProducer {
      * Constructor to initialize {@code FileService} instance with the specified logger.
      */
     public FileService(ServerConfig config, String path) {
-        if (path.equals("/")) path += config.getDefaultPageFile() +"."+ config.getDefaultPageExtension();
-        this.path = config.getDocumentRoot() + path;
+        if (path.equals("/")) {
+            path = config.getDefaultPageFile() + "." + config.getDefaultPageExtension();
+            this.path = config.getDocumentRoot() + File.separator + path;
+        } else if (Paths.get(path).isAbsolute()) {
+            this.path = path;
+        } else {
+            this.path = config.getDocumentRoot() + path;
+        }
     }
+
 
     /**
      * Reads the file content in a thread-safe manner similar to what has been discussed in class.
