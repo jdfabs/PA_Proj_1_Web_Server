@@ -6,13 +6,13 @@ public class Main {
     public static void main(String[] args) {
 
         ServerConfig config;
-        Logger logger1 = new Logger();
+        config = new ServerConfig("server/server.config");
+
+        Logger logger1 = new Logger(config);
         logger1.start();
 
-        Logger logger2 = new Logger();
+        Logger logger2 = new Logger(config);
         logger2.start();
-
-        config = new ServerConfig("server/server.config");
 
         if (config.getRoot() == null) {
             //Failed to load config

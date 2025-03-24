@@ -1,6 +1,7 @@
 package logging;
 
 import com.sun.jdi.InvalidTypeException;
+import config.ServerConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +11,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class Logger extends Thread implements SharedBuffer , LogProducer{
     private volatile boolean running = true;
+    private final String logPath;
+
+    public Logger(ServerConfig config) {
+        this.logPath = System.getProperty("user.dir") + config.getLogPath() + "/" + config.getLogFileName() + ".log";
+    }
+
 
     public void run() {
         while (running) {

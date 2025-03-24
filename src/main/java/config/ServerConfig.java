@@ -22,7 +22,7 @@ public class ServerConfig implements LogProducer {
     }
 
     public String getRoot() {
-        return properties.getProperty("server.root");
+        return  System.getProperty("user.dir")+"/" + properties.getProperty("server.root");
     }
 
     public int getPort() {
@@ -38,7 +38,7 @@ public class ServerConfig implements LogProducer {
     }
 
     public String getDocumentRoot() {
-        return properties.getProperty("server.document.root");
+        return System.getProperty("user.dir") + properties.getProperty("server.document.root");
     }
 
     public String getPage404() {
@@ -50,4 +50,11 @@ public class ServerConfig implements LogProducer {
     }
 
 
+    public String getLogPath() {
+        return properties.getProperty("server.logPath");
+    }
+
+    public String getLogFileName() {
+        return properties.getProperty("server.logFileName");
+    }
 }

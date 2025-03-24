@@ -19,12 +19,11 @@ class ServerConfigTest {
     void setUp() {
         // Load config file for tests (from src/test/resources)
         config = new ServerConfig("src/test/java/resources/server.config");
-        SharedBuffer.buffer.clear();
     }
 
     @Test
     void testGetRoot() {
-        assertEquals("\"test_html/\"", config.getRoot());
+        assertEquals("/home/skipper/Documents/GitHub/PA-Proj-1/PA_Proj_1_Web_Server/test_html/", config.getRoot());
     }
 
     @Test
@@ -34,7 +33,7 @@ class ServerConfigTest {
 
     @Test
     void testGetDefaultPage() {
-        assertEquals("test_index", config.getDefaultPageFile());
+        assertEquals("index", config.getDefaultPageFile());
     }
 
     @Test

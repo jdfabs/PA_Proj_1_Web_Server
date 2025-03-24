@@ -1,5 +1,6 @@
 package core;
 
+import config.ServerConfig;
 import logging.*;
 import utils.*;
 
@@ -17,19 +18,18 @@ import java.io.OutputStream;
 public class RequestHandler implements LogProducer {
     private final BufferedReader in;
     private final OutputStream out;
-    private final String serverRoot;
+    private final ServerConfig config;
 
     /**
      * Constructs a RequestHandler with necessary dependencies.
      *
      * @param br           input stream to read the client's request.
      * @param clientOutput output stream to send the response.
-     * @param serverRoot   root directory for serving files.
      */
-    public RequestHandler(BufferedReader br, OutputStream clientOutput, String serverRoot) {
+    public RequestHandler(BufferedReader br, OutputStream clientOutput, ServerConfig serverConfig) {
         this.in = br;
         this.out = clientOutput;
-        this.serverRoot = serverRoot;
+        this.config = serverConfig;
     }
 
     /**
@@ -45,7 +45,7 @@ public class RequestHandler implements LogProducer {
                 return;
             }
 
-            FileService fileService = new FileService(serverRoot, route);
+            FileService fileService = new FileService(config, route);
             RequestValidator requestValidator = new RequestValidator(request);
             HeaderBuilder headerBuilder = new HeaderBuilder();
 
@@ -137,7 +137,7 @@ public class RequestHandler implements LogProducer {
      */
     private void sendNotFoundResponse(String headers) throws IOException, InterruptedException {
         // Create and start a FileService thread to read the custom 404 page.
-        FileService fileService = new FileService(serverRoot , "/404.html");
+        FileService fileService = new FileService(config , "/404.html");
         fileService.start();
         fileService.join();
         byte[] content = fileService.getContent();

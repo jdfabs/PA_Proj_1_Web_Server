@@ -1,5 +1,6 @@
 package utils;
 
+import config.ServerConfig;
 import logging.*;
 
 import java.io.IOException;
@@ -20,9 +21,9 @@ public class FileService extends Thread implements LogProducer {
     /**
      * Constructor to initialize {@code FileService} instance with the specified logger.
      */
-    public FileService(String webRoot,String path) {
-        if (path.equals("/")) path += "index.html";
-        this.path = webRoot + path;
+    public FileService(ServerConfig config, String path) {
+        if (path.equals("/")) path += config.getDefaultPageFile() +"."+ config.getDefaultPageExtension();
+        this.path = config.getDocumentRoot() + path;
     }
 
     /**

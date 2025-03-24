@@ -12,9 +12,7 @@ import java.net.Socket;
  * It serves files from a predefined server root directory.
  */
 public class MainHTTPServerThread extends Thread implements LogProducer {
-
-    private static String webRoot = System.getProperty("user.dir"); // Define by user
-    private final int port;
+    private final ServerConfig serverConfig;
 
     /**
      * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
@@ -22,8 +20,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      * @param config the server configuration containing port and root directory information.
      */
     public MainHTTPServerThread(ServerConfig config) {
-        this.port = config.getPort();
-        webRoot += config.getDocumentRoot();
+        this.serverConfig = config;
     }
 
     /**
@@ -33,9 +30,9 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      */
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server started on port: " + port));
-            logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Server root: " + webRoot));
+        try (ServerSocket serverSocket = new ServerSocket(serverConfig.getPort())) {
+            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Server started on port: " + serverConfig.getPort()));
+            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Server root: " + serverConfig.getDocumentRoot()));
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -60,7 +57,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
              BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              OutputStream clientOutput = socket.getOutputStream()) {
 
-            RequestHandler requestHandler = new RequestHandler(br, clientOutput, webRoot);
+            RequestHandler requestHandler = new RequestHandler(br, clientOutput, serverConfig);
             requestHandler.processRequest();
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error handling client request: " + e.getMessage()));
