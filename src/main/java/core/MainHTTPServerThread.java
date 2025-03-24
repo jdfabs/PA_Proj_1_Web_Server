@@ -32,6 +32,8 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      */
     @Override
     public void run() {
+        logMessage(new LoggingTask(LogType.Info,LogLocation.File,"MainHTTPServerThread has started!"));
+
         try (ServerSocket serverSocket = new ServerSocket(serverConfig.getPort())) {
             logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Server started on port: " + serverConfig.getPort()));
             logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Server root: " + serverConfig.getDocumentRoot()));

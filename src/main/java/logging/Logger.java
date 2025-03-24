@@ -3,6 +3,12 @@ package logging;
 import com.sun.jdi.InvalidTypeException;
 import config.ServerConfig;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -103,7 +109,21 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
     }
 
     private void logFile(String message) {
+        File logFile = new File(logPath);
 
+        File parentDir = logFile.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+            writer.write(timestamp + " " + message);
+            writer.newLine();
+        } catch (IOException e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
+        }
     }
 
     /**
