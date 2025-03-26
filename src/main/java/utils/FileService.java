@@ -21,11 +21,9 @@ public class FileService extends Thread implements LogProducer {
      * Constructor to initialize {@code FileService} instance with the specified logger.
      */
     public FileService(ServerConfig config, String path) {
-        if (path.equals("/")) {
-            path = config.getDefaultPageFile() + "." + config.getDefaultPageExtension();
+        if (path.endsWith("/")) {
+            path += config.getDefaultPageFile() + "." + config.getDefaultPageExtension();
             this.path = config.getDocumentRoot() + File.separator + path;
-        } else if (Paths.get(path).isAbsolute()) {
-            this.path = path;
         } else {
             this.path = config.getDocumentRoot() + path;
         }
