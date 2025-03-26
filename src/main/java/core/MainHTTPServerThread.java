@@ -22,7 +22,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      */
     public MainHTTPServerThread(ServerConfig config) {
         this.serverConfig = config;
-        this.threadPool = new ThreadPool(5);
+        this.threadPool = new ThreadPool(config.getMaxRequests());
     }
 
     /**
