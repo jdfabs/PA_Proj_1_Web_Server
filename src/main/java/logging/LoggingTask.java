@@ -1,6 +1,8 @@
 package logging;
 
 
+import java.time.LocalDateTime;
+
 /**
  * task that contains all the components of the message to be logged
  */
@@ -9,11 +11,13 @@ public class LoggingTask {
     private final LogType type;
     private final LogLocation location;
     private final String message;
+    private final LocalDateTime requestTime;
 
     public LoggingTask(LogType type, LogLocation location, String message) {
         this.type = type == null ? LogType.Info : type;
         this.location = location == null? LogLocation.ConsoleOut : location;
         this.message = message == null ? "" : message;
+        this.requestTime = LocalDateTime.now();
     }
 
     /**
@@ -37,4 +41,6 @@ public class LoggingTask {
     public String getMessage() {
         return message;
     }
+
+    public LocalDateTime getRequestTime() { return requestTime; }
 }

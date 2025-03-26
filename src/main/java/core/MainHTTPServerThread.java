@@ -32,7 +32,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
      */
     @Override
     public void run() {
-        logMessage(new LoggingTask(LogType.Info,LogLocation.File,"MainHTTPServerThread has started!"));
+        logMessage(new LoggingTask(LogType.Info,LogLocation.ConsoleOut,"MainHTTPServerThread has started!"));
 
         try (ServerSocket serverSocket = new ServerSocket(serverConfig.getPort())) {
             logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Server started on port: " + serverConfig.getPort()));
@@ -60,7 +60,7 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
              BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              OutputStream clientOutput = socket.getOutputStream()) {
 
-            RequestHandler requestHandler = new RequestHandler(br, clientOutput, serverConfig);
+            RequestHandler requestHandler = new RequestHandler(br, clientOutput, serverConfig, clientSocket.getInetAddress().getHostAddress());
             requestHandler.processRequest();
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error handling client request: " + e.getMessage()));

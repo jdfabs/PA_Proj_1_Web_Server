@@ -19,6 +19,7 @@ public class RequestHandler implements LogProducer {
     private final BufferedReader in;
     private final OutputStream out;
     private final ServerConfig config;
+    private final String origin;
 
     /**
      * Constructs a RequestHandler with necessary dependencies.
@@ -26,10 +27,11 @@ public class RequestHandler implements LogProducer {
      * @param br           input stream to read the client's request.
      * @param clientOutput output stream to send the response.
      */
-    public RequestHandler(BufferedReader br, OutputStream clientOutput, ServerConfig serverConfig) {
+    public RequestHandler(BufferedReader br, OutputStream clientOutput, ServerConfig serverConfig, String clientAddress) {
         this.in = br;
         this.out = clientOutput;
         this.config = serverConfig;
+        this.origin = clientAddress;
     }
 
     /**
@@ -67,13 +69,16 @@ public class RequestHandler implements LogProducer {
             if (!isValid) {
                 logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Invalid request"));
                 sendErrorResponse(400, "Bad Request", header);
+                logMessage(new LoggingTask(LogType.Request,LogLocation.File,request+ " 400 " +  origin));
                 return;
             }
 
             if (content.length == 0) {
                 sendNotFoundResponse(header);
+                logMessage(new LoggingTask(LogType.Request,LogLocation.File,request+ " 404 " +  origin));
             } else {
                 sendOkResponse(content, header);
+                logMessage(new LoggingTask(LogType.Request,LogLocation.File,request+ " 200 " +  origin));
             }
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));

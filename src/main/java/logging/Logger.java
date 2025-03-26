@@ -7,8 +7,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,6 +39,9 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
                     case Warning:
                         warning(loggingTask.getLocation(), loggingTask.getMessage());
                         break;
+                    case Request:
+                        request(loggingTask.getLocation(), loggingTask.getMessage()+" "+loggingTask.getRequestTime());
+                        break;
                     default:
                         throw new InvalidTypeException();
                 }
@@ -48,6 +49,23 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
                 logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
             }
         }
+    }
+
+    private void request(LogLocation location, String message) {
+        String[] tokens = message.split(" ");
+
+        String method = tokens[0];
+        String route = tokens[1];
+        String origin = tokens[tokens.length - 2];
+        String httpStatus = tokens[tokens.length - 3];
+        String timestamp = tokens[tokens.length - 1];
+
+        String logMessage = String.format(
+                "{\"timestamp\":\"%s\",\"method\":\"%s\",\"route\":\"%s\",\"origin\":\"%s\",\"status\":%s},",
+                timestamp, method, route, origin, httpStatus
+        );
+
+        logToLocation(location, logMessage);
     }
 
 
@@ -116,10 +134,8 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
             parentDir.mkdirs();
         }
 
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
-            writer.write(timestamp + " " + message);
+            writer.write( message);
             writer.newLine();
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
