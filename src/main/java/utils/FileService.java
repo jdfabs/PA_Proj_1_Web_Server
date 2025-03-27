@@ -88,9 +88,9 @@ public class FileService extends Thread implements LogProducer {
             content = new byte[0];
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error reading file: " + e.getMessage()));
         } finally {
+            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Done Reading File: " + path));
             fileMonitor.unlockFile(path);
         }
-        logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "DONE READING FILE: " + path));
     }
 
     /**
