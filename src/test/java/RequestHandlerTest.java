@@ -34,7 +34,7 @@ class RequestHandlerTest {
         when(fileService404.getContent()).thenReturn("<h1>404 Not Found</h1>".getBytes());
 
         BufferedReader input = new BufferedReader(new StringReader(httpRequest));
-        RequestHandler handler = new RequestHandler(input, clientOutput, config);
+        RequestHandler handler = new RequestHandler(input, clientOutput, config,"127.0.0.1");
 
         handler.processRequest();
 
