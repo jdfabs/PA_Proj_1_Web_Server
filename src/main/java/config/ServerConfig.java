@@ -7,10 +7,25 @@ import java.util.Properties;
 import java.io.IOException;
 import java.io.FileInputStream;
 
-
+/**
+ * Handles loading and accessing server settings from the config file.
+ * <p>
+ * This class is responsible for retrieving server parameters such as port, document root,
+ * default pages, logging preferences, maximum concurrent requests, and cache expiration time.
+ * It implements {@link LogProducer} to allow logging configuration-related issues.
+ */
 public class ServerConfig implements LogProducer {
+    /**
+     * Properties object that holds all key-value pairs loaded from the configuration file.
+     */
     private final Properties properties = new Properties();
 
+    /**
+     * Constructs a {@code ServerConfig} and loads configuration from the given file path.
+     * Logs an error if the file cannot be loaded.
+     *
+     * @param filePath the path to the server configuration file
+     */
     public ServerConfig(String filePath) {
         try {
             FileInputStream fis = new FileInputStream(filePath);
@@ -22,6 +37,12 @@ public class ServerConfig implements LogProducer {
 
     }
 
+    /**
+     * Returns the root directory where the server is located (working directory + server.root).
+     * If the configuration is missing, defaults to "".
+     *
+     * @return absolute path to the server root directory
+     */
     public String getRoot() {
         try {
             return System.getProperty("user.dir") + "/" + properties.getProperty("server.root");
@@ -31,6 +52,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the port number the server should listen on.
+     * If the configuration is invalid, missing or corrupt, defaults to 8080.
+     *
+     * @return the configured port number
+     */
     public int getPort() {
         try {
             return Integer.parseInt(properties.getProperty("server.port"));
@@ -40,6 +67,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the default file name to serve when a directory is requested.
+     * If the configuration is missing, defaults to "index".
+     *
+     * @return the name of the default page file
+     */
     public String getDefaultPageFile() {
         try {
             return properties.getProperty("server.default.page");
@@ -49,6 +82,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the default file extension for pages.
+     * If the configuration is missing, defaults to "html".
+     *
+     * @return the file extension for default pages
+     */
     public String getDefaultPageExtension() {
         try {
             return properties.getProperty("server.default.page.extension");
@@ -58,6 +97,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the document root directory from which content should be served.
+     * If the configuration is missing, defaults to "/server/html".
+     *
+     * @return the absolute path to the document root
+     */
     public String getDocumentRoot() {
         try {
             return System.getProperty("user.dir") + properties.getProperty("server.document.root");
@@ -67,6 +112,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the relative path to the custom 404 error page.
+     * If the configuration is missing, defaults to "404.html".
+     *
+     * @return the configured 404 error page path
+     */
     public String getPage404() {
         try {
             return properties.getProperty("server.page.404");
@@ -76,6 +127,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the maximum number of concurrent requests the server should handle.
+     * If the configuration is invalid or missing, defaults to 5.
+     *
+     * @return the maximum number of requests
+     */
     public int getMaxRequests() {
         try {
             return Integer.parseInt(properties.getProperty("server.maximum.requests"));
@@ -85,6 +142,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the directory where server logs should be stored.
+     * If the configuration is missing, defaults to "/logs".
+     *
+     * @return the path to the log directory
+     */
     public String getLogPath() {
         try {
             return properties.getProperty("server.logPath");
@@ -94,6 +157,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the name of the log file where request logs will be written.
+     * If the configuration is missing, defaults to "loggingLogsLotsOfLogs".
+     *
+     * @return the name of the log file
+     */
     public String getLogFileName() {
         try {
             return properties.getProperty("server.logFileName");
@@ -103,6 +172,12 @@ public class ServerConfig implements LogProducer {
         }
     }
 
+    /**
+     * Returns the configured cache expiration duration.
+     * If the configuration is invalid or missing, defaults to 30 seconds.
+     *
+     * @return the cache expiration time as a {@link Duration}
+     */
     public Duration getCacheExpirationTime() {
         try {
             return Duration.ofSeconds(Integer.parseInt(properties.getProperty("server.cacheExpirationTime")));
