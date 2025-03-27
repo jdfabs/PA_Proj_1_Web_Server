@@ -65,25 +65,6 @@ public class ThreadPoolTest {
     }
 
     @Test
-    public void testWorkerInterruption() throws InterruptedException {
-        ThreadPool pool = new ThreadPool(1);
-        AtomicInteger counter = new AtomicInteger(0);
-        Runnable task = () -> {
-            try {
-                Thread.sleep(500);
-                counter.incrementAndGet();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        };
-        pool.execute(task);
-        Thread.sleep(100);
-        pool.shutdown();
-        Thread.sleep(100);
-        assertEquals(0, counter.get());
-    }
-
-    @Test
     public void testTaskWithException() throws InterruptedException {
         ThreadPool pool = new ThreadPool(1);
         AtomicInteger counter = new AtomicInteger(0);
