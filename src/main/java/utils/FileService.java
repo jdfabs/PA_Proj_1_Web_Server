@@ -1,5 +1,7 @@
 package utils;
 
+import Cache.CacheManager;
+import Cache.CacheManagerSingleton;
 import config.ServerConfig;
 import logging.*;
 
@@ -37,10 +39,19 @@ public class FileService extends Thread implements LogProducer {
 
     @Override
     public void run() {
+        CacheManager cacheManager = CacheManagerSingleton.getInstance();
+
+        byte[] cachedContent = cacheManager.readFromCache(path);
+        if (cachedContent != null) {
+            content = cachedContent;
+            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Served from cache: " + path));
+            return;
+        }
+
         fileMonitor.lockFile(path);
         try {
             content = Files.readAllBytes(Paths.get(path));
-
+            cacheManager.writeToCache(path, content);
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error reading file: " + e.getMessage()));
             content = new byte[0];

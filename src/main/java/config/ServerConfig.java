@@ -2,6 +2,7 @@ package config;
 
 import logging.*;
 
+import java.time.Duration;
 import java.util.Properties;
 import java.io.IOException;
 import java.io.FileInputStream;
@@ -56,5 +57,14 @@ public class ServerConfig implements LogProducer {
 
     public String getLogFileName() {
         return properties.getProperty("server.logFileName");
+    }
+
+    public Duration getCacheExpirationTime() {
+        try{
+            return Duration.ofSeconds(Integer.parseInt(properties.getProperty("server.cacheExpirationTime")));
+        }
+        catch(Exception e){
+            return Duration.ofSeconds(30); //Default of 30 secs in case of corrupt conf  file
+        }
     }
 }

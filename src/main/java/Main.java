@@ -1,3 +1,4 @@
+import Cache.CacheManagerSingleton;
 import config.ServerConfig;
 import core.MainHTTPServerThread;
 import logging.Logger;
@@ -13,6 +14,9 @@ public class Main {
 
         Logger logger2 = new Logger(config);
         logger2.start();
+
+        CacheManagerSingleton.getInstance().setExpirationTime(config.getCacheExpirationTime());
+        CacheManagerSingleton.getInstance().start();
 
         if (config.getRoot() == null) {
             //Failed to load config
