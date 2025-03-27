@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.FileService;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +26,7 @@ class FileServiceTest {
     @Test
     void testReadFile_Success() throws IOException, InterruptedException {
         // Arrange
-        byte[] expectedContent = Files.readAllBytes(Paths.get(config.getDocumentRoot() +"/"+ config.getDefaultPageFile()+ "." + config.getDefaultPageExtension()));
+        byte[] expectedContent = Files.readAllBytes(Paths.get(config.getDocumentRoot() + File.separator + config.getDefaultPageFile()+ "." + config.getDefaultPageExtension()));
 
         // Act
         FileService fileService = new FileService(config,"/");
