@@ -30,20 +30,11 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
                 if (loggingTask == null) continue;
 
                 switch (loggingTask.getType()) {
-                    case Info:
-                        info(loggingTask.getLocation(), loggingTask.getMessage());
-                        break;
-                    case Error:
-                        error(loggingTask.getLocation(), loggingTask.getMessage());
-                        break;
-                    case Warning:
-                        warning(loggingTask.getLocation(), loggingTask.getMessage());
-                        break;
-                    case Request:
-                        request(loggingTask.getLocation(), loggingTask.getMessage()+" "+loggingTask.getRequestTime());
-                        break;
-                    default:
-                        throw new InvalidTypeException();
+                    case Info -> info(loggingTask.getLocation(), loggingTask.getMessage());
+                    case Error -> error(loggingTask.getLocation(), loggingTask.getMessage());
+                    case Warning -> warning(loggingTask.getLocation(), loggingTask.getMessage());
+                    case Request -> request(loggingTask.getLocation(),loggingTask.getMessage() + " " + loggingTask.getRequestTime());
+                    default -> throw new InvalidTypeException();
                 }
             } catch (InvalidTypeException | InterruptedException e) {
                 logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
@@ -104,17 +95,10 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
 
     private void logToLocation(LogLocation location, String message) {
         switch (location) {
-            case ConsoleOut:
-                logConsoleOut(message);
-                break;
-            case ConsoleErr:
-                logConsoleErr(message);
-                break;
-            case File:
-                logFile(message);
-                break;
-            default:
-                System.err.println("Invalid log location: " + location + " message: " + message);
+            case ConsoleOut -> logConsoleOut(message);
+            case ConsoleErr -> logConsoleErr(message);
+            case File -> logFile(message);
+            default -> System.err.println("Invalid log location: " + location + " message: " + message);
         }
     }
 
