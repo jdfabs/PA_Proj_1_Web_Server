@@ -58,20 +58,13 @@ class FileServiceTest {
 
     @Test
     void testReadFile_EmptyFile() throws IOException, InterruptedException {
-        // Arrange
-        Path tempFile = Files.createTempFile("emptyFile", ".txt");
-
-        // Act
-        FileService fileService = new FileService(config,tempFile.toString());
+        FileService fileService = new FileService(config,"empty.txt");
         fileService.start();
         fileService.join();
 
         byte[] result = fileService.getContent();
 
-        // Assert
         assertEquals(0, result.length);
 
-        // Cleanup
-        Files.deleteIfExists(tempFile);
     }
 }
