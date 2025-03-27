@@ -23,52 +23,92 @@ public class ServerConfig implements LogProducer {
     }
 
     public String getRoot() {
-        return  System.getProperty("user.dir")+"/" + properties.getProperty("server.root");
+        try {
+            return System.getProperty("user.dir") + "/" + properties.getProperty("server.root");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server root is missing."));
+            return "";
+        }
     }
 
     public int getPort() {
-        return Integer.parseInt(properties.getProperty("server.port"));
+        try {
+            return Integer.parseInt(properties.getProperty("server.port"));
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server port Corrupt."));
+            return 8080; //Default in case of corrupt conf
+        }
     }
 
     public String getDefaultPageFile() {
-        return properties.getProperty("server.default.page");
+        try {
+            return properties.getProperty("server.default.page");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server default page is missing."));
+            return "index";
+        }
     }
 
     public String getDefaultPageExtension() {
-        return properties.getProperty("server.default.page.extension");
+        try {
+            return properties.getProperty("server.default.page.extension");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server default page extension is missing."));
+            return "html";
+        }
     }
 
     public String getDocumentRoot() {
-        return System.getProperty("user.dir") + properties.getProperty("server.document.root");
+        try {
+            return System.getProperty("user.dir") + properties.getProperty("server.document.root");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server document root is missing."));
+            return "/server/html";
+        }
     }
 
     public String getPage404() {
-        return properties.getProperty("server.page.404");
+        try {
+            return properties.getProperty("server.page.404");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server 404 page is missing."));
+            return "404.html";
+        }
     }
 
     public int getMaxRequests() {
         try {
-
             return Integer.parseInt(properties.getProperty("server.maximum.requests"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server max requests is corrupt."));
             return 5; //Default in case of corrupt conf
         }
     }
 
     public String getLogPath() {
         return properties.getProperty("server.logPath");
+        try {
+            return properties.getProperty("server.logPath");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server log path is missing."));
+            return "/logs";
+        }
     }
 
     public String getLogFileName() {
-        return properties.getProperty("server.logFileName");
+        try {
+            return properties.getProperty("server.logFileName");
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server log file name is missing."));
+            return "loggingLogsLotsOfLogs";
+        }
     }
 
     public Duration getCacheExpirationTime() {
-        try{
+        try {
             return Duration.ofSeconds(Integer.parseInt(properties.getProperty("server.cacheExpirationTime")));
-        }
-        catch(Exception e){
+        } catch (Exception e) {
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server cache expiration time is corrupt."));
             return Duration.ofSeconds(30); //Default of 30 secs in case of corrupt conf  file
         }
     }
