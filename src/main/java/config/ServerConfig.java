@@ -86,7 +86,6 @@ public class ServerConfig implements LogProducer {
     }
 
     public String getLogPath() {
-        return properties.getProperty("server.logPath");
         try {
             return properties.getProperty("server.logPath");
         } catch (Exception e) {
