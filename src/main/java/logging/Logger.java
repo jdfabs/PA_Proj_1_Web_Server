@@ -10,18 +10,40 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A logger that prints log messages.
- * This class will later be expanded to log to the log file!!
+ * A background logging thread that asynchronously processes log messages from a shared buffer.
+ * <p>
+ * Supports logging to the console (stdout, stderr) and to a log file, including structured
+ * JSON request logging. Logging behavior is determined by {@link LogType} and {@link LogLocation}.
+ * </p>
+ * <p>
+ * Implements {@link SharedBuffer} to consume messages from the global buffer and {@link LogProducer}
+ * to allow recursive error logging if necessary.
+ * </p>
  */
 public class Logger extends Thread implements SharedBuffer, LogProducer {
+    /** Controls whether the logger is actively processing log messages. */
     private volatile boolean running = true;
+    /** Full path to the log file. */
     private final String logPath;
 
+    /**
+     * Constructs a new {@code Logger} instance based on the provided server configuration.
+     *
+     * @param config the {@link ServerConfig} providing log path and log file name
+     */
     public Logger(ServerConfig config) {
         this.logPath = System.getProperty("user.dir") + config.getLogPath() + "/" + config.getLogFileName() + ".log";
     }
 
-
+    /**
+     * Continuously polls the shared buffer for new log messages and processes them.
+     * <p>
+     * Log messages are dispatched based on their type (info, error, warning, request)
+     * and output location (console, file). This method runs in a loop until {@link #shutdown()}
+     * is called or the thread is interrupted.
+     * </p>
+     */
+    @Override
     public void run() {
         while (running) {
             try {
@@ -42,6 +64,12 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
         }
     }
 
+    /**
+     * Logs a structured HTTP request in JSON format.
+     *
+     * @param location the location to output the log (e.g., file)
+     * @param message  the raw request log string containing method, route, status, origin, and timestamp
+     */
     private void request(LogLocation location, String message) {
         String[] tokens = message.split(" ");
 
@@ -61,9 +89,10 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
 
 
     /**
-     * Prints Information
+     * Logs an informational message.
      *
-     * @param message The message which will be on the log
+     * @param location the output destination
+     * @param message  the message to log
      */
     private void info(LogLocation location, String message) {
         String logMessage = "[INFO] " + message;
@@ -72,9 +101,10 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
     }
 
     /**
-     * Prints Errors
+     * Logs an error message.
      *
-     * @param message The message which will be on the log
+     * @param location the output destination
+     * @param message  the message to log
      */
     private void error(LogLocation location, String message) {
         String logMessage = "[ERROR] " + message;
@@ -83,9 +113,10 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
     }
 
     /**
-     * Prints Warnings
+     * Logs a warning message.
      *
-     * @param message The message which will be on the log
+     * @param location the output destination
+     * @param message  the message to log
      */
     private void warning(LogLocation location, String message) {
         String logMessage = "[WARNING] " + message;
@@ -93,6 +124,12 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
         logToLocation(location, logMessage);
     }
 
+    /**
+     * Dispatches a formatted log message to the specified location.
+     *
+     * @param location the log destination
+     * @param message  the message to write
+     */
     private void logToLocation(LogLocation location, String message) {
         switch (location) {
             case ConsoleOut -> logConsoleOut(message);
@@ -102,14 +139,32 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
         }
     }
 
+    /**
+     * Logs a message to standard output.
+     *
+     * @param message the message to print
+     */
     private void logConsoleOut(String message) {
         System.out.println(message);
     }
 
+    /**
+     * Logs a message to standard error.
+     *
+     * @param message the message to print
+     */
     private void logConsoleErr(String message) {
         System.err.println(message);
     }
 
+    /**
+     * Appends a message to the configured log file.
+     * <p>
+     * Ensures the parent directory exists before writing. Errors encountered while
+     * writing to the file are logged to the console.
+     *
+     * @param message the message to write to the file
+     */
     private void logFile(String message) {
         File logFile = new File(logPath);
 
@@ -127,9 +182,9 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
     }
 
     /**
-     * Running flag turns to false, making instance to shut down
+     * Stops the logger thread by setting its {@code running} flag to false.
      *
-     * @return {@code self} for quick instance referenciation
+     * @return {@code this} for convenient chaining (e.g., with {@code join()})
      */
     public Logger shutdown() {
         running = false;
