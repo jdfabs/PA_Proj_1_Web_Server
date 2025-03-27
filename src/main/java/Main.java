@@ -3,7 +3,18 @@ import config.ServerConfig;
 import core.MainHTTPServerThread;
 import logging.Logger;
 
+/**
+ * Entry point of the web server application.
+ * <p>
+ * Initializes server configuration, logging system, cache management,
+ * and launches the main HTTP server thread.
+ */
 public class Main {
+    /**
+     * The main method that starts the web server.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
 
         ServerConfig config;
