@@ -17,7 +17,7 @@ class FileMonitorTest {
     @BeforeEach
     void setUp() {
         logger = mock(Logger.class); // Mock the logger for verifying error logging
-        fileMonitor = new FileMonitor(logger);
+        fileMonitor = new FileMonitor();
     }
 
     @Test

@@ -1,6 +1,6 @@
 package utils;
 
-import logging.Logger;
+import logging.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,9 +12,9 @@ import java.util.Random;
  * A simple file reader.
  * It is responsible for handling file operations.
  */
-public class FileService extends Thread {
+public class FileService extends Thread implements LogProducer {
     private static final Logger logger = new Logger();
-    private static final FileMonitor fileMonitor = new FileMonitor(logger);
+    private static final FileMonitor fileMonitor = new FileMonitor();
     private final String path;
     private byte[] content;
 
@@ -42,17 +42,15 @@ public class FileService extends Thread {
             Thread.sleep(new Random().nextInt(500, 9999));
             //Finish Faking long tasks
         } catch (IOException e) {
-            logger.error("Error reading file: " + e.getMessage());
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, "Error reading file: " + e.getMessage()));
             content = new byte[0];
         } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
+            logMessage(new LoggingTask(LogType.Error, LogLocation.Console, e.getMessage()));
             content = new byte[0];
         } finally {
             fileMonitor.unlockFile(path);
         }
-        System.out.println("DONE READING FILE");
-
-
+        logMessage(new LoggingTask(LogType.Info, LogLocation.Console, "Done Reading File: " + path));
     }
 
     /**

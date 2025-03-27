@@ -8,13 +8,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 /**
  * Handles a single HTTP request from a client.
  * <p>
  * Reads the request, serves the requested file, and writes the HTTP response.
  */
-public class RequestHandler {
+public class RequestHandler implements LogProducer {
     private final BufferedReader in;
     private final OutputStream out;
     private final String serverRoot;
@@ -47,8 +46,8 @@ public class RequestHandler {
                 return;
             }
 
-            FileService fileService = new FileService(serverRoot+route);
-            RequestValidator requestValidator= new RequestValidator(request);
+            FileService fileService = new FileService(serverRoot + route);
+            RequestValidator requestValidator = new RequestValidator(request);
             HeaderBuilder headerBuilder = new HeaderBuilder();
 
             //ParBegin
@@ -135,7 +134,7 @@ public class RequestHandler {
      * Sends a 404 Not Found response, optionally serving a custom 404.html page.
      *
      * @param headers additional HTTP headers as a string.
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException          if an I/O error occurs.
      * @throws InterruptedException if the thread is interrupted while waiting.
      */
     private void sendNotFoundResponse(String headers) throws IOException, InterruptedException {
@@ -159,8 +158,8 @@ public class RequestHandler {
      * Sends an error response with the specified HTTP status code and message.
      *
      * @param errorCode HTTP status code.
-     * @param message HTTP status message.
-     * @param headers additional HTTP headers as a string.
+     * @param message   HTTP status message.
+     * @param headers   additional HTTP headers as a string.
      * @throws IOException if an I/O error occurs.
      */
     private void sendErrorResponse(int errorCode, String message, String headers) throws IOException {

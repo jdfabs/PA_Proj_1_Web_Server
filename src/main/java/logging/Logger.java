@@ -26,12 +26,12 @@ public class Logger extends Thread implements SharedBuffer {
                         throw new InvalidTypeException();
                 }
             } catch (Exception e){
-                //TODO
+
             }
         }
     }
 
-
+//TODO write in specific file using parameters
 
     /**
      * Prints Information
