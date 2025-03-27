@@ -1,5 +1,10 @@
 package core;
 
+import logging.LogLocation;
+import logging.LogProducer;
+import logging.LogType;
+import logging.LoggingTask;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -15,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * no new tasks will be accepted and all threads will be interrupted.
  * </p>
  */
-public class ThreadPool {
+public class ThreadPool implements LogProducer {
     /** Array of worker threads that execute submitted tasks. */
     private final WorkerThread[] workers;
     /** A blocking queue that holds tasks to be processed by worker threads. */
@@ -57,7 +62,7 @@ public class ThreadPool {
             try {
                 taskQueue.put(task);
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Failed to add task to queue"));
             }
         }
     }
