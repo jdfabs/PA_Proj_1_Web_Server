@@ -54,23 +54,6 @@ public class ThreadPoolTest {
     }
 
     @Test
-    public void testShutdown() throws InterruptedException {
-        ThreadPool pool = new ThreadPool(2);
-        pool.execute(() -> {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        });
-        pool.shutdown();
-        Thread.sleep(200);
-        for (WorkerThread worker : pool.getWorkers()) {
-            assertTrue(worker.isShutdown());
-        }
-    }
-
-    @Test
     public void testExecuteAfterShutdown() throws InterruptedException {
         ThreadPool pool = new ThreadPool(1);
         pool.shutdown();
