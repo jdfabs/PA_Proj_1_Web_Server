@@ -50,11 +50,22 @@ public class FileService extends Thread implements LogProducer {
 
         fileMonitor.lockFile(path);
         try {
+            // 2nd check: maybe another thread wrote to cache while we were waiting for the lock
+            cachedContent = cacheManager.readFromCache(path);
+            if (cachedContent != null) {
+                content = cachedContent;
+                logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Served from cache (after lock): " + path));
+                return;
+            }
+
             content = Files.readAllBytes(Paths.get(path));
             cacheManager.writeToCache(path, content);
+            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Read from disk and cached: " + path));
+
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error reading file: " + e.getMessage()));
             content = new byte[0];
+            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Error reading file: " + e.getMessage()));
         } finally {
             fileMonitor.unlockFile(path);
         }
