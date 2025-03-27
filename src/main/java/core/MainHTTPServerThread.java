@@ -8,17 +8,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * A simple HTTP server that listens on a specified port.
- * It serves files from a predefined server root directory.
+ * A simple multithreaded HTTP server that listens on a specified port and serves files from a configured root directory.
+ * <p>
+ * It uses a {@link ThreadPool} to manage concurrent client connections and delegates request handling
+ * to {@link RequestHandler}. Configuration settings such as port number and document root are loaded
+ * via {@link ServerConfig}.
  */
 public class MainHTTPServerThread extends Thread implements LogProducer {
+    /** Configuration for the server (port, root directory, etc.). */
     private final ServerConfig serverConfig;
+    /** Pool of worker threads used to handle incoming client requests concurrently. */
     private final ThreadPool threadPool;
 
     /**
-     * Constructor to initialize the HTTP server thread with the specified configuration, file service, and logger.
+     * Constructs the HTTP server thread using the specified server configuration.
      *
-     * @param config the server configuration containing port and root directory information.
+     * @param config the server configuration containing parameters such as port number and document root
      */
     public MainHTTPServerThread(ServerConfig config) {
         this.serverConfig = config;
@@ -27,8 +32,9 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
 
     /**
      * Starts the HTTP server.
-     * This method initializes a {@code ServerSocket} on the {@link ServerConfig} port and listens new connections.
-     * On a new connection it's logged and sent to {@code handleClient}.
+     * <p>
+     * Opens a {@link ServerSocket} on the configured port and listens for incoming client connections.
+     * Each new connection is passed to the {@link #handleClient(Socket)} method via a thread in the thread pool.
      */
     @Override
     public void run() {
@@ -50,10 +56,12 @@ public class MainHTTPServerThread extends Thread implements LogProducer {
     }
 
     /**
-     * This method wraps the client socket's input and output streams in a {@link BufferedReader} and {@link OutputStream}
-     * respectively, then creates a {@link RequestHandler} to process the HTTP request.
+     * Handles an individual client connection.
+     * <p>
+     * Wraps the socket's input and output streams in a {@link BufferedReader} and {@link OutputStream},
+     * then creates a {@link RequestHandler} to process the client's HTTP request.
      *
-     * @param clientSocket the client socket.
+     * @param clientSocket the socket connected to the client
      */
     private void handleClient(Socket clientSocket) {
         try (Socket socket = clientSocket;
