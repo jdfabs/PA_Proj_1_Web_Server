@@ -2,9 +2,9 @@ name: Test JAVA project on different OS
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [ main, develop ]
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
 
 jobs:
   unit-tests:
@@ -19,6 +19,6 @@ jobs:
         uses: actions/setup-java@v4.7.0
         with:
           distribution: 'oracle'
-          java-version: '23'
+          java-version: '17'
       - name: Run tests with Maven on ${{matrix.os}}
         run: mvn test

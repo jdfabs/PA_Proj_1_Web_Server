@@ -43,6 +43,6 @@ class FileMonitorTest {
         LoggingTask nextLog = SharedBuffer.buffer.remove();
         assertTrue(nextLog.getMessage().contains("Lock for file \"" + fileName + "\" was not found"));
         assertEquals(LogType.Error, nextLog.getType());
-        assertEquals(LogLocation.Console, nextLog.getLocation());
+        assertEquals(LogLocation.ConsoleErr, nextLog.getLocation());
     }
 }
