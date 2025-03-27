@@ -23,7 +23,7 @@ public class FileService extends Thread implements LogProducer {
     public FileService(ServerConfig config, String path) {
         if (path.endsWith("/")) {
             path += config.getDefaultPageFile() + "." + config.getDefaultPageExtension();
-            this.path = config.getDocumentRoot() + File.separator + path;
+            this.path = config.getDocumentRoot() + path;
         } else {
             this.path = config.getDocumentRoot() + path;
         }
