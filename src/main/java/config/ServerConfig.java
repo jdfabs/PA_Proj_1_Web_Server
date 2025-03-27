@@ -47,9 +47,14 @@ public class ServerConfig implements LogProducer {
     }
 
     public int getMaxRequests() {
-        return Integer.parseInt(properties.getProperty("server.maximum.requests"));
-    }
+        try {
 
+            return Integer.parseInt(properties.getProperty("server.maximum.requests"));
+        }
+        catch (Exception e) {
+            return 5; //Default in case of corrupt conf
+        }
+    }
 
     public String getLogPath() {
         return properties.getProperty("server.logPath");
