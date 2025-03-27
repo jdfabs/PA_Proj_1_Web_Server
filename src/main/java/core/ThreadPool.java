@@ -2,6 +2,7 @@ package core;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
 /**
  * A thread pool that manages a fixed number of worker threads to execute tasks.
  * <p>
@@ -16,6 +17,7 @@ public class ThreadPool {
     private final WorkerThread[] workers;
     private final BlockingQueue<Runnable> taskQueue;
     private volatile boolean isShutdown = false;
+
     /**
      * Creates a thread pool with the specified number of worker threads.
      * <p>
@@ -26,16 +28,15 @@ public class ThreadPool {
      * @param poolSize the number of worker threads in the pool
      */
     public ThreadPool(int poolSize) {
-        this.poolSize = poolSize;
         this.taskQueue = new LinkedBlockingQueue<>();
         this.workers = new WorkerThread[poolSize];
 
-        // Starts workers
         for (int i = 0; i < poolSize; i++) {
             workers[i] = new WorkerThread(taskQueue);
             workers[i].start();
         }
     }
+
     /**
      * Submits a task to the thread pool for execution.
      * <p>
@@ -55,6 +56,7 @@ public class ThreadPool {
             }
         }
     }
+
     /**
      * Shuts down the thread pool, interrupting all worker threads.
      * <p>
@@ -68,36 +70,13 @@ public class ThreadPool {
             worker.interrupt();
         }
     }
+
     /**
      * Returns the number of worker threads in the pool.
      *
      * @return the pool size
      */
-    public int getPoolSize() {
-        return poolSize;
-    }
-    /**
-     * Returns the array of worker threads.
-     *
-     * @return the array of {@link WorkerThread} instances
-     */
     public WorkerThread[] getWorkers() {
         return workers;
-    }
-    /**
-     * Returns the task queue used by the thread pool.
-     *
-     * @return the {@link BlockingQueue} containing tasks
-     */
-    public BlockingQueue<Runnable> getTaskQueue() {
-        return taskQueue;
-    }
-    /**
-     * Checks if the thread pool has been shut down.
-     *
-     * @return <code>true</code> if the pool is shut down, <code>false</code> otherwise
-     */
-    public boolean isShutdown() {
-        return isShutdown;
     }
 }
