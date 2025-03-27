@@ -53,16 +53,4 @@ public class WorkerThread extends Thread implements LogProducer {
             }
         }
     }
-    /**
-     * Checks if the worker thread has been shut down.
-     * <p>
-     * This method returns the current shutdown status of the thread, which is set
-     * when the thread is interrupted or explicitly stopped.
-     * </p>
-     *
-     * @return <code>true</code> if the thread is shut down, <code>false</code> otherwise
-     */
-    public boolean isShutdown() {
-        return isShutdown;
-    }
 }
