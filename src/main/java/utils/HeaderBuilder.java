@@ -26,6 +26,7 @@ public class HeaderBuilder extends Thread implements LogProducer {
      *     <li>{@code Date: <current date>}</li>
      * </ul>
      */
+    @Override
     public void run() {
         headerBuilder.append("Content-Type: text/html\r\n");
         headerBuilder.append("Server: pa-web-server\r\n");
