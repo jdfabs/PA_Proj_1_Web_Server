@@ -1,9 +1,16 @@
 import core.ThreadPool;
 import core.WorkerThread;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
+
+import java.lang.reflect.Field;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ThreadPoolTest {
 
@@ -20,21 +27,9 @@ public class ThreadPoolTest {
         pool.shutdown();
     }
 
-    @Test
-    public void testMultipleTaskExecution() throws InterruptedException {
-        ThreadPool pool = new ThreadPool(2);
-        AtomicInteger counter = new AtomicInteger(0);
-        Runnable task = counter::incrementAndGet;
-        pool.execute(task);
-        pool.execute(task);
-        pool.execute(task);
-        Thread.sleep(200); // waits for the tasks to be executed
-        assertEquals(3, counter.get()); //More tasks than workers
-        pool.shutdown();
-    }
-
-    @Test
-    public void testTaskQueueing() throws InterruptedException {
+    @ParameterizedTest
+    @ValueSource(ints = {3,5})
+    public void testTaskQueueing(int count) throws InterruptedException {
         ThreadPool pool = new ThreadPool(2);
         AtomicInteger counter = new AtomicInteger(0);
         Runnable task = () -> {
@@ -45,11 +40,11 @@ public class ThreadPoolTest {
                 Thread.currentThread().interrupt();
             }
         };
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < count; i++) {
             pool.execute(task);
         }
-        Thread.sleep(1000); // Waits for all tasks to be executed
-        assertEquals(5, counter.get());
+        Thread.sleep(100 * count); // Waits for all tasks to be executed
+        assertEquals(count, counter.get());
         pool.shutdown();
     }
 
@@ -60,7 +55,7 @@ public class ThreadPoolTest {
         AtomicInteger counter = new AtomicInteger(0);
         Runnable task = counter::incrementAndGet;
         pool.execute(task);
-        Thread.sleep(100);
+        Thread.sleep(500);
         assertEquals(0, counter.get());
     }
 
@@ -80,15 +75,41 @@ public class ThreadPoolTest {
     }
 
     @Test
-    public void testWorkerReuse() throws InterruptedException {
-        ThreadPool pool = new ThreadPool(1);
-        AtomicInteger counter = new AtomicInteger(0);
-        Runnable task = counter::incrementAndGet;
-        for (int i = 0; i < 3; i++) {
-            pool.execute(task);
+    public void testConstructorCreatesCorrectNumberOfWorkers() throws InterruptedException {
+        int poolSize = 3;
+        ThreadPool pool = new ThreadPool(poolSize);
+        WorkerThread[] workers = pool.getWorkers();
+        assertEquals(poolSize, workers.length);
+        for (WorkerThread worker : workers) {
+            assertTrue(worker.isAlive());
         }
-        Thread.sleep(200);
-        assertEquals(3, counter.get());
         pool.shutdown();
+    }
+
+    @Test
+    public void testShutdownInterruptsWorkers() throws InterruptedException {
+        ThreadPool pool = new ThreadPool(2);
+        WorkerThread[] workers = pool.getWorkers();
+
+        AtomicInteger counter = new AtomicInteger(0);
+        Runnable longTask = () -> {
+            try {
+                Thread.sleep(1000);
+                counter.incrementAndGet();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        };
+
+        pool.execute(longTask);
+        pool.execute(longTask);
+
+        pool.shutdown();
+        Thread.sleep(100);
+
+        for (WorkerThread worker : workers) {
+            assertTrue(worker.isInterrupted() || !worker.isAlive(),
+                    "Worker should be interrupted or terminated after shutdown");
+        }
     }
 }
