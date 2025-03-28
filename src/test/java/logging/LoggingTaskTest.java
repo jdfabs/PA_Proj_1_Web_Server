@@ -25,7 +25,7 @@ class LoggingTaskTest {
 
     @Test
     public void testType() {
-        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.Console, "test message");
+        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "test message");
 
         assertTrue(testLoggingTask.getType()==LogType.Info);
 
@@ -33,7 +33,7 @@ class LoggingTaskTest {
 
     @Test
     public void testMessage() {
-        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.Console, "test message");
+        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "test message");
 
         assertTrue(testLoggingTask.getMessage()=="test message");
 
@@ -41,9 +41,9 @@ class LoggingTaskTest {
 
     @Test
     public void testLocation() {
-        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.Console, "test message");
+        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "test message");
 
-        assertTrue(testLoggingTask.getLocation()==LogLocation.Console);
+        assertTrue(testLoggingTask.getLocation()==LogLocation.ConsoleOut);
 
     }
 }

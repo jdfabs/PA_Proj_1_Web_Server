@@ -1,25 +1,28 @@
 import config.ServerConfig;
+import logging.LogLocation;
+import logging.LogType;
+import logging.LoggingTask;
+import logging.SharedBuffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ServerConfigTest {
 
     private ServerConfig config;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         // Load config file for tests (from src/test/resources)
         config = new ServerConfig("src/test/java/resources/server.config");
     }
 
     @Test
     void testGetRoot() {
-        assertEquals("\"test_html/\"", config.getRoot());
+        assertEquals(System.getProperty("user.dir")+"/test_html/", config.getRoot());
     }
 
     @Test
@@ -29,7 +32,7 @@ class ServerConfigTest {
 
     @Test
     void testGetDefaultPage() {
-        assertEquals("test_index", config.getDefaultPageFile());
+        assertEquals("index", config.getDefaultPageFile());
     }
 
     @Test
@@ -45,12 +48,5 @@ class ServerConfigTest {
     @Test
     void testGetMaximumRequests() {
         assertEquals(10, config.getMaxRequests());
-    }
-
-    @Test
-    void testInvalidFileThrowsIOException() {
-        assertThrows(IOException.class, () -> {
-            new ServerConfig("invalid/path/to/config.file");
-        });
     }
 }

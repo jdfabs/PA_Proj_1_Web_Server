@@ -35,28 +35,28 @@ class LoggerTest {
      * assures that test message is printed out corretly
      */
     public void testInfoLogger(){
-        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.Console, "test message");
+        LoggingTask testLoggingTask = new LoggingTask(LogType.Info, LogLocation.File, "test message");
 
         assertEquals(testLoggingTask.getType(), LogType.Info);
-        assertEquals(testLoggingTask.getLocation(), LogLocation.Console);
+        assertEquals(testLoggingTask.getLocation(), LogLocation.File);
         assertEquals(testLoggingTask.getMessage(), "test message");
 
     }
 
     public void testErrorLogger(){
-        LoggingTask testLoggingTask = new LoggingTask(LogType.Error, LogLocation.Console, "test message");
+        LoggingTask testLoggingTask = new LoggingTask(LogType.Error, LogLocation.File, "test message");
 
         assertEquals(testLoggingTask.getType(), LogType.Error);
-        assertEquals(testLoggingTask.getLocation(), LogLocation.Console);
+        assertEquals(testLoggingTask.getLocation(), LogLocation.File);
         assertEquals(testLoggingTask.getMessage(), "test message");
 
     }
 
     public void testWarningLogger(){
-        LoggingTask testLoggingTask = new LoggingTask(LogType.Warning, LogLocation.Console, "test message");
+        LoggingTask testLoggingTask = new LoggingTask(LogType.Warning, LogLocation.File, "test message");
 
         assertEquals(testLoggingTask.getType(), LogType.Warning);
-        assertEquals(testLoggingTask.getLocation(), LogLocation.Console);
+        assertEquals(testLoggingTask.getLocation(), LogLocation.File);
         assertEquals(testLoggingTask.getMessage(), "test message");
 
     }

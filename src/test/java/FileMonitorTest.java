@@ -1,22 +1,22 @@
-import logging.Logger;
+import logging.LogLocation;
+import logging.LogType;
+import logging.LoggingTask;
+import logging.SharedBuffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.FileMonitor;
 
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class FileMonitorTest {
 
     private FileMonitor fileMonitor;
-    private Logger logger;
 
     @BeforeEach
     void setUp() {
-        logger = mock(Logger.class); // Mock the logger for verifying error logging
+        SharedBuffer.buffer.clear();
         fileMonitor = new FileMonitor();
     }
 
@@ -32,12 +32,17 @@ class FileMonitorTest {
     }
 
     @Test
-    void testUnlockFile_WithoutLock_LogsError() {
+    void testUnlockFile_WithoutLock_LogsError() throws InterruptedException {
         String fileName = "unlockedFile.html";
 
         // Attempting to unlock a file that hasn't been locked should log an error
         fileMonitor.unlockFile(fileName);
 
-        verify(logger, times(1)).error(contains("Lock for file \"unlockedFile.html\" was not found"));
+        TimeUnit.MILLISECONDS.sleep(100); //Wait message
+
+        LoggingTask nextLog = SharedBuffer.buffer.remove();
+        assertTrue(nextLog.getMessage().contains("Lock for file \"" + fileName + "\" was not found"));
+        assertEquals(LogType.Error, nextLog.getType());
+        assertEquals(LogLocation.ConsoleErr, nextLog.getLocation());
     }
 }
