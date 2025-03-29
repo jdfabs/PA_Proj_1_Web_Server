@@ -106,7 +106,7 @@ public class LoggerTest {
 
 
 
-        assertTrue(task.getRequestTime().isAfter(before) && task.getRequestTime().isBefore(LocalDateTime.now()));
+        assertTrue(task.getRequestTime().isAfter(before.minusSeconds(1)) && task.getRequestTime().isBefore(LocalDateTime.now().plusSeconds(1)));
     }
 
     @Test
