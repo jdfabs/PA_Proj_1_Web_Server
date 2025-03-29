@@ -98,14 +98,15 @@ public class LoggerTest {
 
     @Test
     public void testLoggingTaskGetters() {
+        LocalDateTime before = LocalDateTime.now();
         LoggingTask task = new LoggingTask(LogType.Info, LogLocation.ConsoleOut, "Task message");
+        LocalDateTime after = LocalDateTime.now();
 
         assertEquals(LogType.Info, task.getType());
         assertEquals(LogLocation.ConsoleOut, task.getLocation());
         assertEquals("Task message", task.getMessage());
 
-        LocalDateTime before = LocalDateTime.now().minusSeconds(1);
-        LocalDateTime after = LocalDateTime.now();
+
 
         assertTrue(task.getRequestTime().isAfter(before) && task.getRequestTime().isBefore(after));
     }
