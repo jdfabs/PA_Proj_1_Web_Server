@@ -3,6 +3,7 @@ package config;
 import logging.*;
 
 import java.time.Duration;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.io.IOException;
 import java.io.FileInputStream;
@@ -45,7 +46,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getRoot() {
         try {
-            return System.getProperty("user.dir") + "/" + properties.getProperty("server.root");
+            String root = properties.getProperty("server.root");
+            if (root == null) throw new NoSuchFieldException();
+            return System.getProperty("user.dir") + "/" + root;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server root is missing."));
             return "";
@@ -75,7 +78,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getDefaultPageFile() {
         try {
-            return properties.getProperty("server.default.page");
+            String defaultPage = properties.getProperty("server.default.page");
+            if (defaultPage == null) throw new NoSuchFieldException();
+            return defaultPage;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server default page is missing."));
             return "index";
@@ -90,7 +95,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getDefaultPageExtension() {
         try {
-            return properties.getProperty("server.default.page.extension");
+            String extension = properties.getProperty("server.default.page.extension");
+            if (extension == null) throw new NoSuchFieldException();
+            return extension;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server default page extension is missing."));
             return "html";
@@ -105,7 +112,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getDocumentRoot() {
         try {
-            return System.getProperty("user.dir") + properties.getProperty("server.document.root");
+            String docRoot = properties.getProperty("server.document.root");
+            if (docRoot == null) throw new NoSuchFieldException();
+            return System.getProperty("user.dir") + docRoot;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server document root is missing."));
             return "/server/html";
@@ -120,7 +129,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getPage404() {
         try {
-            return properties.getProperty("server.page.404");
+            String page404 = properties.getProperty("server.page.404");
+            if (page404 == null) throw new NoSuchFieldException();
+            return page404;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server 404 page is missing."));
             return "404.html";
@@ -150,7 +161,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getLogPath() {
         try {
-            return properties.getProperty("server.logPath");
+            String path = properties.getProperty("server.logPath");
+            if (path == null) throw new NoSuchFieldException();
+            return path;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server log path is missing."));
             return "/logs";
@@ -165,7 +178,9 @@ public class ServerConfig implements LogProducer {
      */
     public String getLogFileName() {
         try {
-            return properties.getProperty("server.logFileName");
+            String fileName = properties.getProperty("server.logFileName");
+            if (fileName == null) throw new NoSuchFieldException();
+            return fileName;
         } catch (Exception e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, "Server config: Server log file name is missing."));
             return "loggingLogsLotsOfLogs";
