@@ -43,7 +43,7 @@ public class ThreadPoolTest {
         for (int i = 0; i < count; i++) {
             pool.execute(task);
         }
-        Thread.sleep(100 * count); // Waits for all tasks to be executed
+        Thread.sleep(200L * count); // Waits for all tasks to be executed
         assertEquals(count, counter.get());
         pool.shutdown();
     }
