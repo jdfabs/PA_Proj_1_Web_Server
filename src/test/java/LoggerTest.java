@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,6 +103,11 @@ public class LoggerTest {
         assertEquals(LogType.Info, task.getType());
         assertEquals(LogLocation.ConsoleOut, task.getLocation());
         assertEquals("Task message", task.getMessage());
+
+        LocalDateTime before = LocalDateTime.now().minusSeconds(1);
+        LocalDateTime after = LocalDateTime.now();
+
+        assertTrue(task.getRequestTime().isAfter(before) && task.getRequestTime().isBefore(after));
     }
 
     @Test
