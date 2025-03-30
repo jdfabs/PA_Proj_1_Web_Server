@@ -5,7 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -136,5 +140,33 @@ public class LoggerTest {
 
         logger.shutdown().join();
     }
+
+    @Test
+    public void testRequestMethod() throws InterruptedException {
+
+        Logger logger = new Logger(config);
+        logger.start();
+
+        String requestMessage = "GET /api/test 200 127.0.0.1";
+        LoggingTask task = new LoggingTask(LogType.Request, LogLocation.ConsoleOut, requestMessage);
+
+        SharedBuffer.buffer.add(task);
+
+        while (!SharedBuffer.buffer.isEmpty()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
+        TimeUnit.MILLISECONDS.sleep(500);
+
+        String output = outContent.toString();
+        String expectedJson = String.format(
+                "{\"timestamp\":\"%s\",\"method\":\"GET\",\"route\":\"/api/test\",\"origin\":\"127.0.0.1\",\"status\":200},\r\n",
+                task.getRequestTime().toString()
+        );
+        assertTrue(output.contains(expectedJson),
+                "Expected JSON request log not found in output. Expected: " + expectedJson + ", Got: " + output);
+
+        logger.shutdown().join();
+    }
+
 }
 
