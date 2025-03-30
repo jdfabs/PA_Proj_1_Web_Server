@@ -2,6 +2,7 @@ package logging;
 
 import com.sun.jdi.InvalidTypeException;
 import config.ServerConfig;
+import utils.FileMonitor;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -166,6 +167,10 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
      * @param message the message to write to the file
      */
     private void logFile(String message) {
+
+        FileMonitor fileMonitor = new FileMonitor();
+
+        fileMonitor.lockFile(logPath);
         File logFile = new File(logPath);
 
         File parentDir = logFile.getParentFile();
@@ -178,6 +183,9 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
             writer.newLine();
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
+        }
+        finally {
+            fileMonitor.unlockFile(logPath);
         }
     }
 
