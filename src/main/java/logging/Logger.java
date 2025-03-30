@@ -161,12 +161,23 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
     }
 
     /**
-     * Appends a message to the configured log file.
+     * Appends a JSON-formatted log message to the configured log file.
      * <p>
-     * Ensures the parent directory exists before writing. Errors encountered while
-     * writing to the file are logged to the console.
+     * This method ensures that the log file always maintains a valid JSON array format.
+     * If the log file does not exist or is empty, a new file is created with a JSON array
+     * containing the provided log message as its first element. If the file already exists,
+     * the method reads the current content, removes the final closing bracket, appends a comma
+     * if necessary, inserts the new log message, and then re-adds the closing bracket.
+     * </p>
+     * <p>
+     * The parent directory is created if it does not exist. All file access is synchronized via
+     * a {@code FileMonitor} to protect against concurrent modifications. Additionally, to avoid
+     * delaying user responses, it is recommended that the invocation of this method be performed
+     * asynchronously.
+     * </p>
      *
-     * @param message the message to write to the file
+     * @param message the JSON-formatted log message to write to the file; this should be a valid
+     *                JSON object (without the trailing comma) that conforms to the expected format.
      */
     private void logFile(String message) {
         FileMonitor fileMonitor = new FileMonitor();
