@@ -159,7 +159,7 @@ public class LoggerTest {
 
         String output = outContent.toString();
         String expectedJson = String.format(
-                "{\"timestamp\":\"%s\",\"method\":\"GET\",\"route\":\"/api/test\",\"origin\":\"127.0.0.1\",\"status\":200},\r\n",
+                "{\"timestamp\":\"%s\",\"method\":\"GET\",\"route\":\"/api/test\",\"origin\":\"127.0.0.1\",\"status\":200}\r\n",
                 task.getRequestTime().toString()
         );
         assertTrue(output.contains(expectedJson),
