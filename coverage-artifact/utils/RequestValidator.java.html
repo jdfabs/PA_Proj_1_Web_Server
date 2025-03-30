@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RequestValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">utils</a> &gt; <span class="el_source">RequestValidator.java</span></div><h1>RequestValidator.java</h1><pre class="source lang-java linenums">package utils;
+
+import logging.LogProducer;
+
+/**
+ * A thread that validates the structure of an incoming HTTP request.
+ * &lt;p&gt;
+ * The {@code RequestValidator} checks whether the request is a well-formed HTTP GET request.
+ * The result of the validation can be retrieved using {@link #getIsValidRequest()}.
+ * &lt;p&gt;
+ * This class is designed to be used in parallel with other request-processing components
+ * as part of a parbegin-parend concurrency pattern.
+ */
+public class RequestValidator extends Thread implements LogProducer {
+    /** The raw HTTP request string. */
+    private final String request;
+    /** Whether the request is valid (set during execution). */
+    private boolean isValidRequest;
+
+    /**
+     * Constructs a {@code RequestValidator} with the specified HTTP request.
+     *
+     * @param request the raw HTTP request string to validate
+     */
+<span class="fc" id="L25">    public RequestValidator(String request) {</span>
+<span class="fc" id="L26">        this.request = request;</span>
+<span class="fc" id="L27">    }</span>
+
+    /**
+     * Validates the request format when the thread is executed.
+     * &lt;p&gt;
+     * The request is considered valid if it starts with {@code GET}
+     * and contains at least two tokens (method and route).
+     */
+    @Override
+    public void run() {
+<span class="pc bpc" id="L37" title="1 of 4 branches missed.">        isValidRequest = request.startsWith(&quot;GET&quot;) &amp;&amp; request.split(&quot; &quot;).length &gt;= 2;</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Returns whether the request passed validation.
+     *
+     * @return {@code true} if the request is valid; {@code false} otherwise
+     */
+    public boolean getIsValidRequest() {
+<span class="fc" id="L46">        return isValidRequest;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

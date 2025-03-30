@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">utils</a> &gt; <span class="el_source">FileService.java</span></div><h1>FileService.java</h1><pre class="source lang-java linenums">package utils;
+
+import Cache.CacheManager;
+import Cache.CacheManagerSingleton;
+import config.ServerConfig;
+import logging.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+/**
+ * A thread-based file reader that handles file access with concurrency and caching.
+ * &lt;p&gt;
+ * The {@code FileService} reads content from the filesystem in a thread-safe manner
+ * using {@link FileMonitor} to prevent concurrent access to the same file.
+ * &lt;p&gt;
+ * It also interacts with {@link CacheManager} to serve cached content if available,
+ * reducing disk I/O and improving response time.
+ */
+public class FileService extends Thread implements LogProducer {
+    /** A global file monitor used to coordinate exclusive file access. */
+<span class="fc" id="L23">    private static final FileMonitor fileMonitor = new FileMonitor();</span>
+    /** The fully resolved file system path to the target file. */
+    private final String path;
+    /** The content of the file, once read. */
+    private byte[] content;
+
+    /**
+     * Constructs a {@code FileService} instance and resolves the full path of the target file.
+     * &lt;p&gt;
+     * If the path ends with a slash, the default page name and extension are appended
+     * based on the provided {@link ServerConfig}.
+     *
+     * @param config the server configuration containing document root and default file info
+     * @param path   the requested route or file path (relative)
+     */
+<span class="fc" id="L38">    public FileService(ServerConfig config, String path) {</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (path.endsWith(&quot;/&quot;)) {</span>
+<span class="fc" id="L40">            path += config.getDefaultPageFile() + &quot;.&quot; + config.getDefaultPageExtension();</span>
+<span class="fc" id="L41">            this.path = config.getDocumentRoot() + path;</span>
+        } else {
+<span class="fc" id="L43">            this.path = config.getDocumentRoot() + path;</span>
+        }
+<span class="fc" id="L45">    }</span>
+
+
+    /**
+     * Executes the file read operation in a thread-safe, cache-aware manner.
+     * &lt;p&gt;
+     * This method performs the following steps:
+     * &lt;ol&gt;
+     *     &lt;li&gt;Checks if the file content is already in cache&lt;/li&gt;
+     *     &lt;li&gt;If not, locks the file using {@link FileMonitor} to avoid race conditions&lt;/li&gt;
+     *     &lt;li&gt;Performs a second cache check after acquiring the lock&lt;/li&gt;
+     *     &lt;li&gt;If still uncached, reads from disk and updates the cache&lt;/li&gt;
+     *     &lt;li&gt;Logs the result and releases the lock&lt;/li&gt;
+     * &lt;/ol&gt;
+     * &lt;p&gt;
+     * If any error occurs during file reading, empty content is returned and the error is logged.
+     */
+    @Override
+    public void run() {
+<span class="fc" id="L64">        CacheManager cacheManager = CacheManagerSingleton.getInstance();</span>
+
+<span class="fc" id="L66">        byte[] cachedContent = cacheManager.readFromCache(path);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (cachedContent != null) {</span>
+<span class="fc" id="L68">            content = cachedContent;</span>
+<span class="fc" id="L69">            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, &quot;Served from cache: &quot; + path));</span>
+<span class="fc" id="L70">            return;</span>
+        }
+
+<span class="fc" id="L73">        fileMonitor.lockFile(path);</span>
+        try {
+            // 2nd check: maybe another thread wrote to cache while we were waiting for the lock
+<span class="fc" id="L76">            cachedContent = cacheManager.readFromCache(path);</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">            if (cachedContent != null) {</span>
+<span class="nc" id="L78">                content = cachedContent;</span>
+<span class="nc" id="L79">                logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, &quot;Served from cache (after lock): &quot; + path));</span>
+<span class="nc" id="L80">                return;</span>
+            }
+
+<span class="fc" id="L83">            content = Files.readAllBytes(Paths.get(path));</span>
+<span class="fc" id="L84">            cacheManager.writeToCache(path, content);</span>
+<span class="fc" id="L85">            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, &quot;Read from disk and cached: &quot; + path));</span>
+
+<span class="fc" id="L87">        } catch (IOException e) {</span>
+<span class="fc" id="L88">            content = new byte[0];</span>
+<span class="fc" id="L89">            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, &quot;Error reading file: &quot; + e.getMessage()));</span>
+        } finally {
+<span class="fc" id="L91">            logMessage(new LoggingTask(LogType.Info, LogLocation.ConsoleOut, &quot;Done Reading File: &quot; + path));</span>
+<span class="fc" id="L92">            fileMonitor.unlockFile(path);</span>
+        }
+<span class="fc" id="L94">    }</span>
+
+    /**
+     * Returns the content read from the file.
+     *
+     * @return a byte array containing the file's content.
+     */
+    public byte[] getContent() {
+<span class="fc" id="L102">        return content;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

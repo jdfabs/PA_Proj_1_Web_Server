@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileMonitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">utils</a> &gt; <span class="el_source">FileMonitor.java</span></div><h1>FileMonitor.java</h1><pre class="source lang-java linenums">package utils;
+
+import logging.*;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * Ensures exclusive, FIFO-based access to individual files using per-file locks.
+ * &lt;p&gt;
+ * The {@code FileMonitor} class implements a monitor-style synchronization mechanism
+ * using {@link ReentrantLock}s mapped to file paths. Each file has its own lock,
+ * allowing concurrent file access across different files while ensuring that
+ * access to the same file is strictly serialized.
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * Locks are created on demand and stored in a shared {@link ConcurrentHashMap}.
+ * FIFO ordering is enforced using {@code ReentrantLock(true)}.
+ */
+<span class="fc" id="L21">public class FileMonitor implements LogProducer {</span>
+
+    /** A map of file paths to their associated reentrant locks. */
+<span class="fc" id="L24">    private static final ConcurrentHashMap&lt;String, Lock&gt; fileLocks = new ConcurrentHashMap&lt;&gt;();</span>
+
+    /**
+     * Acquires an exclusive FIFO lock for the specified file path.
+     * &lt;p&gt;
+     * If a lock does not already exist for the file, one is created with fairness enabled.
+     * This guarantees that threads will acquire the lock in the order they requested it.
+     * &lt;/p&gt;
+     *
+     * @param fileName the path of the file to lock
+     */
+    public void lockFile(String fileName) {
+<span class="fc" id="L36">        Lock lock = fileLocks.computeIfAbsent(fileName, k -&gt; new ReentrantLock(true));</span>
+<span class="fc" id="L37">        lock.lock();</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Releases the lock held for the specified file.
+     * &lt;p&gt;
+     * If no lock is found for the file, an error is logged.
+     * &lt;/p&gt;
+     *
+     * @param fileName the path of the file to unlock
+     */
+    public void unlockFile(String fileName) {
+<span class="fc" id="L49">        Lock lock = fileLocks.get(fileName);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (lock != null) {</span>
+<span class="fc" id="L51">            lock.unlock();</span>
+        } else {
+<span class="fc" id="L53">            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, &quot;Lock for file \&quot;&quot; + fileName + &quot;\&quot; was not found&quot;));</span>
+        }
+<span class="fc" id="L55">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

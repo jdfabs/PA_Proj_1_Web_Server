@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheManagerSingleton.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">Cache</a> &gt; <span class="el_source">CacheManagerSingleton.java</span></div><h1>CacheManagerSingleton.java</h1><pre class="source lang-java linenums">package Cache;
+
+/**
+ * Singleton class that provides a single shared instance of {@link CacheManager}, using the Singleton Pattern.
+ * &lt;p&gt;
+ * This ensures that the caching system is consistent and centralized.
+ * All components accessing the cache should do so via {@code CacheManagerSingleton.getInstance()}.
+ */
+public class CacheManagerSingleton {
+    /** The single instance of the cache manager used throughout the application. */
+<span class="fc" id="L11">    private static final CacheManager instance = new CacheManager();</span>
+
+    /**
+     * Private constructor to prevent instantiation.
+     * This class is intended to be used via {@link #getInstance()} only.
+     */
+    private CacheManagerSingleton() {
+    }
+
+    /**
+     * Returns the shared instance of {@link CacheManager}.
+     *
+     * @return the singleton {@code CacheManager} instance
+     */
+    public static CacheManager getInstance() {
+<span class="fc" id="L26">        return instance;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

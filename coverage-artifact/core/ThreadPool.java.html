@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ThreadPool.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">core</a> &gt; <span class="el_source">ThreadPool.java</span></div><h1>ThreadPool.java</h1><pre class="source lang-java linenums">package core;
+
+import logging.LogLocation;
+import logging.LogProducer;
+import logging.LogType;
+import logging.LoggingTask;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+/**
+ * A thread pool that manages a fixed number of worker threads to execute tasks.
+ * &lt;p&gt;
+ * This class initializes a pool of {@link WorkerThread} instances that continuously
+ * fetch and execute {@link Runnable} tasks from a shared {@link BlockingQueue}.
+ * Tasks are submitted using the {@link #execute(Runnable)} method.
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * The thread pool can be gracefully shut down using {@link #shutdown()}, after which
+ * no new tasks will be accepted and all threads will be interrupted.
+ * &lt;/p&gt;
+ */
+public class ThreadPool implements LogProducer {
+    /** Array of worker threads that execute submitted tasks. */
+    private final WorkerThread[] workers;
+    /** A blocking queue that holds tasks to be processed by worker threads. */
+    private final BlockingQueue&lt;Runnable&gt; taskQueue;
+    /** Indicates whether the thread pool has been shut down. */
+<span class="fc" id="L29">    private volatile boolean isShutdown = false;</span>
+
+    /**
+     * Constructs a thread pool with the specified number of worker threads.
+     * &lt;p&gt;
+     * A {@link LinkedBlockingQueue} is used for storing tasks, and each worker
+     * thread is started immediately upon creation.
+     * &lt;/p&gt;
+     *
+     * @param poolSize the number of worker threads in the pool
+     */
+<span class="fc" id="L40">    public ThreadPool(int poolSize) {</span>
+<span class="fc" id="L41">        this.taskQueue = new LinkedBlockingQueue&lt;&gt;();</span>
+<span class="fc" id="L42">        this.workers = new WorkerThread[poolSize];</span>
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        for (int i = 0; i &lt; poolSize; i++) {</span>
+<span class="fc" id="L45">            workers[i] = new WorkerThread(taskQueue);</span>
+<span class="fc" id="L46">            workers[i].start();</span>
+        }
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * Submits a task to the thread pool for execution.
+     * &lt;p&gt;
+     * If the thread pool has not been shut down, the task is added to the task queue
+     * and will be picked up by an available worker thread. If the pool is shut down,
+     * the task will be ignored.
+     * &lt;/p&gt;
+     *
+     * @param task the {@link Runnable} task to be executed
+     */
+    public void execute(Runnable task) {
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (!isShutdown) {</span>
+            try {
+<span class="fc" id="L63">                taskQueue.put(task);</span>
+<span class="fc" id="L64">            } catch (InterruptedException e) {</span>
+<span class="fc" id="L65">                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, &quot;Failed to add task to queue&quot;));</span>
+<span class="fc" id="L66">            }</span>
+        }
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * Shuts down the thread pool, preventing any new tasks from being submitted.
+     * &lt;p&gt;
+     * All currently running worker threads will be interrupted, and the {@code isShutdown}
+     * flag is set to {@code true}.
+     * &lt;/p&gt;
+     */
+    public void shutdown() {
+<span class="fc" id="L78">        isShutdown = true;</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        for (WorkerThread worker : workers) {</span>
+<span class="fc" id="L80">            worker.interrupt();</span>
+        }
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * Returns the array of worker threads currently managed by this thread pool.
+     *
+     * @return an array of {@link WorkerThread} instances
+     */
+    public WorkerThread[] getWorkers() {
+<span class="fc" id="L90">        return workers;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

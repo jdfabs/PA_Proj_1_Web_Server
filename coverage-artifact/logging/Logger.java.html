@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Logger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">logging</a> &gt; <span class="el_source">Logger.java</span></div><h1>Logger.java</h1><pre class="source lang-java linenums">package logging;
+
+import com.sun.jdi.InvalidTypeException;
+import config.ServerConfig;
+import utils.FileMonitor;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * A background logging thread that asynchronously processes log messages from a shared buffer.
+ * &lt;p&gt;
+ * Supports logging to the console (stdout, stderr) and to a log file, including structured
+ * JSON request logging. Logging behavior is determined by {@link LogType} and {@link LogLocation}.
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * Implements {@link SharedBuffer} to consume messages from the global buffer and {@link LogProducer}
+ * to allow recursive error logging if necessary.
+ * &lt;/p&gt;
+ */
+public class Logger extends Thread implements SharedBuffer, LogProducer {
+    /** Controls whether the logger is actively processing log messages. */
+<span class="fc" id="L28">    private volatile boolean running = true;</span>
+    /** Full path to the log file. */
+    private final String logPath;
+
+    /**
+     * Constructs a new {@code Logger} instance based on the provided server configuration.
+     *
+     * @param config the {@link ServerConfig} providing log path and log file name
+     */
+<span class="fc" id="L37">    public Logger(ServerConfig config) {</span>
+<span class="fc" id="L38">        this.logPath = System.getProperty(&quot;user.dir&quot;) + config.getLogPath() + &quot;/&quot; + config.getLogFileName() + &quot;.log&quot;;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Continuously polls the shared buffer for new log messages and processes them.
+     * &lt;p&gt;
+     * Log messages are dispatched based on their type (info, error, warning, request)
+     * and output location (console, file). This method runs in a loop until {@link #shutdown()}
+     * is called or the thread is interrupted.
+     * &lt;/p&gt;
+     */
+    @Override
+    public void run() {
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        while (running) {</span>
+            try {
+<span class="fc" id="L53">                LoggingTask loggingTask = buffer.poll(100, TimeUnit.MILLISECONDS);</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">                if (loggingTask == null) continue;</span>
+
+<span class="pc bpc" id="L57" title="1 of 5 branches missed.">                switch (loggingTask.getType()) {</span>
+<span class="fc" id="L58">                    case Info -&gt; info(loggingTask.getLocation(), loggingTask.getMessage());</span>
+<span class="fc" id="L59">                    case Error -&gt; error(loggingTask.getLocation(), loggingTask.getMessage());</span>
+<span class="fc" id="L60">                    case Warning -&gt; warning(loggingTask.getLocation(), loggingTask.getMessage());</span>
+<span class="fc" id="L61">                    case Request -&gt; request(loggingTask.getLocation(),loggingTask.getMessage() + &quot; &quot; + loggingTask.getRequestTime());</span>
+<span class="nc" id="L62">                    default -&gt; throw new InvalidTypeException();</span>
+                }
+<span class="nc" id="L64">            } catch (InvalidTypeException | InterruptedException e) {</span>
+<span class="nc" id="L65">                logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));</span>
+<span class="pc" id="L66">            }</span>
+        }
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * Logs a structured HTTP request in JSON format.
+     *
+     * @param location the location to output the log (e.g., file)
+     * @param message  the raw request log string containing method, route, status, origin, and timestamp
+     */
+    private void request(LogLocation location, String message) {
+<span class="fc" id="L77">        String[] tokens = message.split(&quot; &quot;);</span>
+
+<span class="fc" id="L79">        String method = tokens[0];</span>
+<span class="fc" id="L80">        String route = tokens[1];</span>
+<span class="fc" id="L81">        String origin = tokens[tokens.length - 2];</span>
+<span class="fc" id="L82">        String httpStatus = tokens[tokens.length - 3];</span>
+<span class="fc" id="L83">        String timestamp = tokens[tokens.length - 1];</span>
+
+<span class="fc" id="L85">        String logMessage = String.format(</span>
+                &quot;{\&quot;timestamp\&quot;:\&quot;%s\&quot;,\&quot;method\&quot;:\&quot;%s\&quot;,\&quot;route\&quot;:\&quot;%s\&quot;,\&quot;origin\&quot;:\&quot;%s\&quot;,\&quot;status\&quot;:%s}&quot;,
+                timestamp, method, route, origin, httpStatus
+        );
+
+<span class="fc" id="L90">        logToLocation(location, logMessage);</span>
+<span class="fc" id="L91">    }</span>
+
+
+    /**
+     * Logs an informational message.
+     *
+     * @param location the output destination
+     * @param message  the message to log
+     */
+    private void info(LogLocation location, String message) {
+<span class="fc" id="L101">        String logMessage = &quot;[INFO] &quot; + message;</span>
+
+<span class="fc" id="L103">        logToLocation(location, logMessage);</span>
+<span class="fc" id="L104">    }</span>
+
+    /**
+     * Logs an error message.
+     *
+     * @param location the output destination
+     * @param message  the message to log
+     */
+    private void error(LogLocation location, String message) {
+<span class="fc" id="L113">        String logMessage = &quot;[ERROR] &quot; + message;</span>
+
+<span class="fc" id="L115">        logToLocation(location, logMessage);</span>
+<span class="fc" id="L116">    }</span>
+
+    /**
+     * Logs a warning message.
+     *
+     * @param location the output destination
+     * @param message  the message to log
+     */
+    private void warning(LogLocation location, String message) {
+<span class="fc" id="L125">        String logMessage = &quot;[WARNING] &quot; + message;</span>
+
+<span class="fc" id="L127">        logToLocation(location, logMessage);</span>
+<span class="fc" id="L128">    }</span>
+
+    /**
+     * Dispatches a formatted log message to the specified location.
+     *
+     * @param location the log destination
+     * @param message  the message to write
+     */
+    private void logToLocation(LogLocation location, String message) {
+<span class="pc bpc" id="L137" title="1 of 4 branches missed.">        switch (location) {</span>
+<span class="fc" id="L138">            case ConsoleOut -&gt; logConsoleOut(message);</span>
+<span class="fc" id="L139">            case ConsoleErr -&gt; logConsoleErr(message);</span>
+<span class="fc" id="L140">            case File -&gt; logFile(message);</span>
+<span class="nc" id="L141">            default -&gt; System.err.println(&quot;Invalid log location: &quot; + location + &quot; message: &quot; + message);</span>
+        }
+<span class="fc" id="L143">    }</span>
+
+    /**
+     * Logs a message to standard output.
+     *
+     * @param message the message to print
+     */
+    private void logConsoleOut(String message) {
+<span class="fc" id="L151">        System.out.println(message);</span>
+<span class="fc" id="L152">    }</span>
+
+    /**
+     * Logs a message to standard error.
+     *
+     * @param message the message to print
+     */
+    private void logConsoleErr(String message) {
+<span class="fc" id="L160">        System.err.println(message);</span>
+<span class="fc" id="L161">    }</span>
+
+    /**
+     * Appends a JSON-formatted log message to the configured log file.
+     * &lt;p&gt;
+     * This method ensures that the log file always maintains a valid JSON array format.
+     * If the log file does not exist or is empty, a new file is created with a JSON array
+     * containing the provided log message as its first element. If the file already exists,
+     * the method reads the current content, removes the final closing bracket, appends a comma
+     * if necessary, inserts the new log message, and then re-adds the closing bracket.
+     * &lt;/p&gt;
+     * &lt;p&gt;
+     * The parent directory is created if it does not exist. All file access is synchronized via
+     * a {@code FileMonitor} to protect against concurrent modifications. Additionally, to avoid
+     * delaying user responses, it is recommended that the invocation of this method be performed
+     * asynchronously.
+     * &lt;/p&gt;
+     *
+     * @param message the JSON-formatted log message to write to the file; this should be a valid
+     *                JSON object (without the trailing comma) that conforms to the expected format.
+     */
+    private void logFile(String message) {
+<span class="fc" id="L183">        FileMonitor fileMonitor = new FileMonitor();</span>
+<span class="fc" id="L184">        fileMonitor.lockFile(logPath);</span>
+<span class="fc" id="L185">        File logFile = new File(logPath);</span>
+
+<span class="fc" id="L187">        File parentDir = logFile.getParentFile();</span>
+<span class="pc bpc" id="L188" title="2 of 4 branches missed.">        if (parentDir != null &amp;&amp; !parentDir.exists()) {</span>
+<span class="nc" id="L189">            parentDir.mkdirs();</span>
+        }
+
+        try {
+<span class="pc bpc" id="L193" title="1 of 4 branches missed.">            if (!logFile.exists() || logFile.length() == 0) {</span>
+<span class="fc" id="L194">                try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile))) {</span>
+<span class="fc" id="L195">                    writer.write(&quot;[\n&quot; + message + &quot;\n]&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L198">                String content = new String(Files.readAllBytes(logFile.toPath()), StandardCharsets.UTF_8);</span>
+<span class="nc" id="L199">                content = content.trim();</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">                if (!content.endsWith(&quot;]&quot;)) {</span>
+<span class="nc" id="L201">                    throw new IOException(&quot;Log file is not in the correct JSON format.&quot;);</span>
+                }
+
+<span class="nc" id="L204">                int lastBracketIndex = content.lastIndexOf(&quot;]&quot;);</span>
+<span class="nc" id="L205">                String contentWithoutClosing = content.substring(0, lastBracketIndex).trim();</span>
+
+<span class="nc bnc" id="L207" title="All 2 branches missed.">                String separator = contentWithoutClosing.equals(&quot;[&quot;) ? &quot;&quot; : &quot;,&quot;;</span>
+<span class="nc" id="L208">                String newContent = contentWithoutClosing + separator + &quot;\n&quot; + message + &quot;\n]&quot;;</span>
+
+<span class="nc" id="L210">                try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile))) {</span>
+<span class="nc" id="L211">                    writer.write(newContent);</span>
+                }
+            }
+<span class="nc" id="L214">        } catch (IOException e) {</span>
+<span class="nc" id="L215">            logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));</span>
+        } finally {
+<span class="fc" id="L217">            fileMonitor.unlockFile(logPath);</span>
+        }
+<span class="fc" id="L219">    }</span>
+
+    /**
+     * Stops the logger thread by setting its {@code running} flag to false.
+     *
+     * @return {@code this} for convenient chaining (e.g., with {@code join()})
+     */
+    public Logger shutdown() {
+<span class="fc" id="L227">        running = false;</span>
+<span class="fc" id="L228">        return this; //self return for thread join convenience #LINQIsLove</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

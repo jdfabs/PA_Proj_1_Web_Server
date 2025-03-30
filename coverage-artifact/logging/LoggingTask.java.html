@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoggingTask.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa-web-server</a> &gt; <a href="index.source.html" class="el_package">logging</a> &gt; <span class="el_source">LoggingTask.java</span></div><h1>LoggingTask.java</h1><pre class="source lang-java linenums">package logging;
+
+
+import java.time.LocalDateTime;
+
+
+/**
+ * Represents a single log task containing all necessary information to be logged.
+ * &lt;p&gt;
+ * This class encapsulates the log type, destination, message content, and timestamp.
+ * It is used by the logging system to defer and centralize log writing asynchronously.
+ */
+public class LoggingTask {
+    /**
+     * The type or severity of the log (e.g., Info, Error, Request).
+     */
+    private final LogType type;
+    /**
+     * The location where the log should be written (e.g., ConsoleOut, File).
+     */
+    private final LogLocation location;
+    /**
+     * The log message content.
+     */
+    private final String message;
+    /**
+     * The timestamp indicating when the log task was created.
+     */
+    private final LocalDateTime requestTime;
+
+    /**
+     * Constructs a {@code LoggingTask} with the given type, location, and message.
+     * If any parameter is {@code null}, a sensible default is applied:
+     * &lt;ul&gt;
+     *     &lt;li&gt;Type defaults to {@link LogType#Info}&lt;/li&gt;
+     *     &lt;li&gt;Location defaults to {@link LogLocation#ConsoleOut}&lt;/li&gt;
+     *     &lt;li&gt;Message defaults to an empty string&lt;/li&gt;
+     * &lt;/ul&gt;
+     *
+     * @param type     the severity/type of log (can be {@code null})
+     * @param location the destination of the log (can be {@code null})
+     * @param message  the content of the log (can be {@code null})
+     */
+<span class="fc" id="L44">    public LoggingTask(LogType type, LogLocation location, String message) {</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        this.type = type == null ? LogType.Info : type;</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        this.location = location == null ? LogLocation.ConsoleOut : location;</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">        this.message = message == null ? &quot;&quot; : message;</span>
+<span class="fc" id="L48">        this.requestTime = LocalDateTime.now();</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * Returns the type of this log task.
+     *
+     * @return the {@link LogType} representing the log severity or category
+     */
+    public LogType getType() {
+<span class="fc" id="L57">        return type;</span>
+    }
+
+    /**
+     * Returns the output location for this log task.
+     *
+     * @return the {@link LogLocation} where the log should be written
+     */
+    public LogLocation getLocation() {
+<span class="fc" id="L66">        return location;</span>
+    }
+
+    /**
+     * Returns the message content of the log.
+     *
+     * @return the log message string
+     */
+    public String getMessage() {
+<span class="fc" id="L75">        return message;</span>
+    }
+
+    /**
+     * Returns the timestamp of when the log task was created.
+     *
+     * @return a {@link LocalDateTime} representing the request time
+     */
+    public LocalDateTime getRequestTime() {
+<span class="fc" id="L84">        return requestTime;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
