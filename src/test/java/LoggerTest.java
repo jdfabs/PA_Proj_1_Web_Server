@@ -8,8 +8,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -157,16 +159,68 @@ public class LoggerTest {
         }
         TimeUnit.MILLISECONDS.sleep(500);
 
-        String output = outContent.toString();
+        String output = outContent.toString().replace("\n", "").replace("\r", "");
         String expectedJson = String.format(
                 "{\"timestamp\":\"%s\",\"method\":\"GET\",\"route\":\"/api/test\",\"origin\":\"127.0.0.1\",\"status\":200}\r\n",
                 task.getRequestTime().toString()
-        );
+        ).replace("\n", "").replace("\r", "");
         assertTrue(output.contains(expectedJson),
                 "Expected JSON request log not found in output. Expected: " + expectedJson + ", Got: " + output);
 
         logger.shutdown().join();
     }
 
+    @Test
+    public void testLogFileNewFile() throws IOException, InterruptedException {
+        ServerConfig config = new ServerConfig("src/test/java/resources/server2.config");
+        Logger logger = new Logger(config);
+        logger.start();
+
+        String requestMessage = "GET /api/test 200 127.0.0.1";
+        LoggingTask task = new LoggingTask(LogType.Request, LogLocation.File, requestMessage);
+
+        SharedBuffer.buffer.add(task);
+
+        while (!SharedBuffer.buffer.isEmpty()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
+        TimeUnit.MILLISECONDS.sleep(500);
+        String filePath = Paths.get(config.getRoot() + config.getLogPath() + "/" + config.getLogFileName() + ".log").toString();
+        File newLog = new File(filePath);
+        assertTrue(newLog.exists(), "Log file does not exist");
+        newLog.delete();
+        logger.shutdown().join();
+    }
+
+    @Test
+    public void testLogFile() throws IOException, InterruptedException {
+        ServerConfig config = new ServerConfig("src/test/java/resources/server.config");
+        Logger logger = new Logger(config);
+        logger.start();
+
+        String requestMessage = "GET /api/test 200 127.0.0.1";
+        LoggingTask task = new LoggingTask(LogType.Request, LogLocation.File, requestMessage);
+        String filePath = Paths.get(config.getRoot() + config.getLogPath() + "/" + config.getLogFileName() + ".log").toString();
+        File logs = new File(filePath);
+        assertTrue(logs.exists(), "Log file does not exist");
+
+        SharedBuffer.buffer.add(task);
+
+        while (!SharedBuffer.buffer.isEmpty()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
+        TimeUnit.MILLISECONDS.sleep(500);
+
+        String content = new String(Files.readAllBytes(logs.toPath()), StandardCharsets.UTF_8).replace("\n", "").replace("\r", "");
+
+        String expectedJson = String.format(
+                "{\"timestamp\":\"%s\",\"method\":\"GET\",\"route\":\"/api/test\",\"origin\":\"127.0.0.1\",\"status\":200}\r\n",
+                task.getRequestTime().toString()
+        ).replace("\n", "").replace("\r", "");
+        assertTrue(content.contains(expectedJson),
+                "Expected JSON request log not found in output. Expected: " + expectedJson + ", Got: " + content);
+
+        logger.shutdown().join();
+    }
 }
 

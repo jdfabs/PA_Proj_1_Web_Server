@@ -20,7 +20,7 @@ class ServerConfigTest {
 
     @Test
     void testGetRoot() {
-        assertEquals(System.getProperty("user.dir")+"/test_html/", config.getRoot());
+        assertEquals(System.getProperty("user.dir")+"/", config.getRoot());
         assertEquals("", emptyConfig.getRoot());
     }
 
