@@ -202,6 +202,7 @@ public class LoggerTest {
         LoggingTask task = new LoggingTask(LogType.Request, LogLocation.File, requestMessage);
         String filePath = Paths.get(config.getRoot() + config.getLogPath() + "/" + config.getLogFileName() + ".log").toString();
         File logs = new File(filePath);
+        logs.createNewFile();
         assertTrue(logs.exists(), "Log file does not exist");
 
         SharedBuffer.buffer.add(task);
