@@ -8,6 +8,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -81,7 +83,7 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
         String timestamp = tokens[tokens.length - 1];
 
         String logMessage = String.format(
-                "{\"timestamp\":\"%s\",\"method\":\"%s\",\"route\":\"%s\",\"origin\":\"%s\",\"status\":%s},",
+                "{\"timestamp\":\"%s\",\"method\":\"%s\",\"route\":\"%s\",\"origin\":\"%s\",\"status\":%s}",
                 timestamp, method, route, origin, httpStatus
         );
 
@@ -167,9 +169,7 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
      * @param message the message to write to the file
      */
     private void logFile(String message) {
-
         FileMonitor fileMonitor = new FileMonitor();
-
         fileMonitor.lockFile(logPath);
         File logFile = new File(logPath);
 
@@ -178,13 +178,31 @@ public class Logger extends Thread implements SharedBuffer, LogProducer {
             parentDir.mkdirs();
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
-            writer.write( message);
-            writer.newLine();
+        try {
+            if (!logFile.exists() || logFile.length() == 0) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile))) {
+                    writer.write("[\n" + message + "\n]");
+                }
+            } else {
+                String content = new String(Files.readAllBytes(logFile.toPath()), StandardCharsets.UTF_8);
+                content = content.trim();
+                if (!content.endsWith("]")) {
+                    throw new IOException("Log file is not in the correct JSON format.");
+                }
+
+                int lastBracketIndex = content.lastIndexOf("]");
+                String contentWithoutClosing = content.substring(0, lastBracketIndex).trim();
+
+                String separator = contentWithoutClosing.equals("[") ? "" : ",";
+                String newContent = contentWithoutClosing + separator + "\n" + message + "\n]";
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile))) {
+                    writer.write(newContent);
+                }
+            }
         } catch (IOException e) {
             logMessage(new LoggingTask(LogType.Error, LogLocation.ConsoleErr, e.getMessage()));
-        }
-        finally {
+        } finally {
             fileMonitor.unlockFile(logPath);
         }
     }
