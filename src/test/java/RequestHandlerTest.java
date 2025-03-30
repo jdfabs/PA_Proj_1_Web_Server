@@ -72,4 +72,22 @@ class RequestHandlerTest {
         assertTrue(response.contains("</body>"), "Message must contain /body");
         assertTrue(response.contains("</html>"), "Message must contain /html");
     }
+
+    @Test
+    void shouldRespond400WhenRequestIsInvalid() throws Exception {
+        // Arrange
+        String invalidRequest = "PUT /indexThatDoesntExist.html HTTP/1.1\\r\\n\\r\\n";
+        BufferedReader input = new BufferedReader(new StringReader(invalidRequest));
+        RequestHandler handler = new RequestHandler(input, clientOutput, config, "127.0.0.1");
+
+        // Act
+        handler.processRequest();
+
+        // Assert
+        String response = clientOutput.toString();
+        assertTrue(response.contains("HTTP/1.1 400 Bad Request"), "Message must contain status 400 Bad Request");
+        assertTrue(response.contains("Content-Type: text/html"), "Message must contain Content-Type: text/html");
+        assertTrue(response.contains("Server: pa-web-server"), "Message must contain Server");
+        assertTrue(response.contains("Date:"), "Message must contain Date:");
+    }
 }
